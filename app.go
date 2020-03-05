@@ -38,7 +38,7 @@ func main() {
 	router := gin.Default()
 
 	userRoute := router.Group("/user")
-	routes.UserRoute(userRoute, app.Handler)
+	routes.UserRoute(userRoute)
 
 	router.Run(":8000")
 }
