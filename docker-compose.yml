@@ -10,17 +10,16 @@ services:
       - ./:/go/src/app
     ports:
       - 9119:8000
-    depends_on: 
+    depends_on:
       - mongodb
-    links: 
+    links:
       - mongodb
-    environment: 
-      port: 9119
+    environment:
+      port: 8000
 
   mongodb:
     image: mongo
-    volumes: 
+    volumes:
       - ./data:/data/db
     ports:
       - 27017:27017
-      

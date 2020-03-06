@@ -4,18 +4,26 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	ut "github.com/go-playground/universal-translator"
+	"github.com/go-playground/validator"
+	"github.com/icecreamhotz/movie-ticket/models"
 	"github.com/icecreamhotz/movie-ticket/utils"
-	"gopkg.in/go-playground/validator.v9"
 )
 
-type User struct {
-	Name     string `form:"name" json:"name" binding:"required"`
-	Username string `form:"username" json:"username" binding:"required"`
-	Password string `form:"password" json:"password" binding:"required"`
+type UserHandler struct {
+	Service   models.UserRepository
+	Validator ut.Translator
 }
 
-func (handler *ServiceHandler) RegisterUserPost(c *gin.Context) {
-	var user User
+func NewUserHandler(repository models.UserRepository, validator ut.Translator) UserHandler {
+	return UserHandler{
+		Service:   repository,
+		Validator: validator,
+	}
+}
+
+func (handler *UserHandler) RegisterUserPost(c *gin.Context) {
+	var user models.User
 	var err error
 	if err = c.ShouldBind(&user); err != nil {
 		errs := err.(validator.ValidationErrors)

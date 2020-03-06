@@ -9,7 +9,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-func NewDatabase(config *configs.ConfigDatabase) (*mongo.Client, error) {
+func NewDatabase(config configs.ConfigDatabase) (*mongo.Client, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), config.Timeout)
 	defer cancel()
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(

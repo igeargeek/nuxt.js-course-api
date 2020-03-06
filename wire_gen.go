@@ -9,6 +9,7 @@ import (
 	"github.com/icecreamhotz/movie-ticket/configs"
 	"github.com/icecreamhotz/movie-ticket/controllers"
 	"github.com/icecreamhotz/movie-ticket/database"
+	"github.com/icecreamhotz/movie-ticket/models"
 	"github.com/icecreamhotz/movie-ticket/utils"
 	"time"
 )
@@ -21,8 +22,9 @@ func InitialApplication(mongoURI string, timeout time.Duration) (App, error) {
 	if err != nil {
 		return App{}, err
 	}
+	userRepository := models.NewUserRepository(client)
 	translator := utils.NewValidateTranslation()
-	serviceHandler := controllers.NewHandler(client, translator)
-	app := NewApplication(serviceHandler)
+	userHandler := controllers.NewUserHandler(userRepository, translator)
+	app := NewAppDatabase(client, userHandler)
 	return app, nil
 }

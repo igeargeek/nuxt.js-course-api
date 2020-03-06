@@ -5,8 +5,8 @@ import (
 	"github.com/icecreamhotz/movie-ticket/controllers"
 )
 
-var serviceHandler controllers.ServiceHandler
+var userHandler controllers.UserHandler
 
 func UserRoute(router *gin.RouterGroup) {
-	router.POST("/register", serviceHandler.RegisterUserPost)
+	router.POST("/register", userHandler.RegisterUserPost)
 }

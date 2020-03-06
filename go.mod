@@ -11,6 +11,7 @@ require (
 	github.com/icecreamhotz/movie-ticket/configs v0.0.0
 	github.com/icecreamhotz/movie-ticket/controllers v0.0.0
 	github.com/icecreamhotz/movie-ticket/database v0.0.0
+	github.com/icecreamhotz/movie-ticket/models v0.0.0
 	github.com/icecreamhotz/movie-ticket/routes v0.0.0
 	github.com/icecreamhotz/movie-ticket/utils v0.0.0
 	go.mongodb.org/mongo-driver v1.3.1
@@ -25,6 +26,7 @@ replace (
 	github.com/icecreamhotz/movie-ticket/configs v0.0.0 => ./src/configs
 	github.com/icecreamhotz/movie-ticket/controllers v0.0.0 => ./src/controllers
 	github.com/icecreamhotz/movie-ticket/database v0.0.0 => ./src/database
+	github.com/icecreamhotz/movie-ticket/models v0.0.0 => ./src/models
 	github.com/icecreamhotz/movie-ticket/routes v0.0.0 => ./src/routes
 	github.com/icecreamhotz/movie-ticket/utils v0.0.0 => ./src/utils
 )
