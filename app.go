@@ -31,16 +31,11 @@ func main() {
 	if err != nil {
 		log.Fatal("App initial error")
 	}
-	// mongoURI := fmt.Sprintf("mongodb+srv://%s:<%s>@cluster0-zz20n.mongodb.net/test?retryWrites=true&w=majority", "icecreamhotz", "zazaza1b")
-	// app, err := InitialApplication(mongoURI, 1*time.Second)
-	// if err != nil {
-	// 	log.Fatal("failed to create event: %s\n", err)
-	// }
 
 	databaseErr := app.DB.Ping(context.TODO(), nil)
 
 	if databaseErr != nil {
-		log.Fatal(databaseErr)
+		log.Fatal("databaseErr", databaseErr)
 	}
 
 	router := gin.Default()
