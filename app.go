@@ -41,7 +41,7 @@ func main() {
 
 	router := gin.Default()
 
-	userRoute := router.Group("/user")
+	userRoute := router.Group("/users")
 	routes.UserRoute(userRoute, app.UserHandler)
 
 	router.Run(":" + os.Getenv("port"))
