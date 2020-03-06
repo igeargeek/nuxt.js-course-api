@@ -6,12 +6,13 @@
 package main
 
 import (
+	"time"
+
 	"github.com/icecreamhotz/movie-ticket/configs"
 	"github.com/icecreamhotz/movie-ticket/controllers"
 	"github.com/icecreamhotz/movie-ticket/database"
 	"github.com/icecreamhotz/movie-ticket/models"
 	"github.com/icecreamhotz/movie-ticket/utils"
-	"time"
 )
 
 // Injectors from wire.go:

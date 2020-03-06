@@ -35,6 +35,10 @@ type Message struct {
 	Message string `json:"message"`
 }
 
+func ResponseObject(obj interface{}) interface{} {
+	return obj
+}
+
 func ResponseMessage(message string) Message {
 	return Message{
 		Success: false,
