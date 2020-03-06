@@ -1,25 +1,23 @@
 version: "3"
 
 services:
-  go-api:
+  api:
     build:
-      context: ./
-      dockerfile: $PWD/Dockerfile
-    restart: always
-    volumes:
-      - ./:/go/src/app
+      context: .
+      dockerfile: Dockerfile
+    # volumes:
+    #   - ./src:/usr/local/go/src/app/src
     ports:
       - 9119:8000
     depends_on:
-      - mongodb
+      - db
     links:
-      - mongodb
+      - db
     environment:
       port: 8000
+      mongo_uri: "mongodb://db:27017"
 
-  mongodb:
+  db:
     image: mongo
     volumes:
-      - ./data:/data/db
-    ports:
-      - 27017:27017
+      - ./data:/data

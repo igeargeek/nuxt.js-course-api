@@ -6,12 +6,13 @@ package main
 import (
 	"time"
 
+	"app/src/configs"
+	"app/src/controllers"
+	"app/src/database"
+	"app/src/models"
+	"app/src/utils"
+
 	"github.com/google/wire"
-	"github.com/icecreamhotz/movie-ticket/configs"
-	"github.com/icecreamhotz/movie-ticket/controllers"
-	"github.com/icecreamhotz/movie-ticket/database"
-	"github.com/icecreamhotz/movie-ticket/models"
-	"github.com/icecreamhotz/movie-ticket/utils"
 )
 
 func InitialApplication(mongoURI string, timeout time.Duration) (App, error) {

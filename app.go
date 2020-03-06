@@ -7,9 +7,10 @@ import (
 	"os"
 	"time"
 
+	"app/src/controllers"
+	"app/src/routes"
+
 	"github.com/gin-gonic/gin"
-	"github.com/icecreamhotz/movie-ticket/controllers"
-	"github.com/icecreamhotz/movie-ticket/routes"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -26,7 +27,7 @@ func NewAppDatabase(db *mongo.Client, userHandler controllers.UserHandler) App {
 }
 
 func main() {
-	mongoURI := fmt.Sprintf("mongodb://mongodb:27017/")
+	mongoURI := fmt.Sprintf(os.Getenv("mongo_uri"))
 	app, err := InitialApplication(mongoURI, 1*time.Second)
 	if err != nil {
 		log.Fatal("App initial error")

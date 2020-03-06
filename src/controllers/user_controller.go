@@ -3,11 +3,12 @@ package controllers
 import (
 	"net/http"
 
+	"app/src/models"
+	"app/src/utils"
+
 	"github.com/gin-gonic/gin"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator"
-	"github.com/icecreamhotz/movie-ticket/models"
-	"github.com/icecreamhotz/movie-ticket/utils"
 )
 
 type UserHandler struct {
@@ -37,5 +38,9 @@ func (handler *UserHandler) RegisterUserPost(c *gin.Context) {
 		return
 	}
 
+	c.JSON(http.StatusCreated, utils.ResponseMessage("Create Successfully."))
+}
+
+func (handler *UserHandler) ListOfUsersGet(c *gin.Context) {
 	c.JSON(http.StatusCreated, utils.ResponseMessage("Create Successfully."))
 }

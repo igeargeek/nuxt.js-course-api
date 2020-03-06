@@ -3,7 +3,8 @@ package database
 import (
 	"fmt"
 
-	"github.com/icecreamhotz/movie-ticket/configs"
+	"app/src/configs"
+
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/net/context"
