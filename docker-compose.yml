@@ -5,8 +5,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    # volumes:
-    #   - ./src:/usr/local/go/src/app/src
+    volumes:
+      - ./src:/usr/local/go/src/app/src
     ports:
       - 9119:8000
     depends_on:

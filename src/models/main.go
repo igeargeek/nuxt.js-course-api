@@ -7,3 +7,9 @@ func NewUserRepository(db *mongo.Client) UserRepository {
 		DB: db,
 	}
 }
+
+func NewMovieRepository(db *mongo.Client) MovieRepository {
+	return MovieRepository{
+		DB: db,
+	}
+}

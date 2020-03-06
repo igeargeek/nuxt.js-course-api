@@ -6,7 +6,6 @@ require (
 	github.com/gin-gonic/gin v1.5.0
 	github.com/go-playground/locales v0.12.1
 	github.com/go-playground/universal-translator v0.16.0
-	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/google/wire v0.4.0
 	go.mongodb.org/mongo-driver v1.3.1
 	golang.org/x/crypto v0.0.0-20200302210943-78000ba7a073 // indirect

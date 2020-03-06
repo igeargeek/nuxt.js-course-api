@@ -15,14 +15,16 @@ import (
 )
 
 type App struct {
-	DB          *mongo.Client
-	UserHandler controllers.UserHandler
+	DB           *mongo.Client
+	UserHandler  controllers.UserHandler
+	MovieHandler controllers.MovieHandler
 }
 
-func NewAppDatabase(db *mongo.Client, userHandler controllers.UserHandler) App {
+func NewAppDatabase(db *mongo.Client, userHandler controllers.UserHandler, movieHandler controllers.MovieHandler) App {
 	return App{
-		DB:          db,
-		UserHandler: userHandler,
+		DB:           db,
+		UserHandler:  userHandler,
+		MovieHandler: movieHandler,
 	}
 }
 
@@ -43,6 +45,9 @@ func main() {
 
 	userRoute := router.Group("/users")
 	routes.UserRoute(userRoute, app.UserHandler)
+
+	movieRoute := router.Group("/movies")
+	routes.MovieRoute(movieRoute, app.MovieHandler)
 
 	router.Run(":" + os.Getenv("port"))
 }

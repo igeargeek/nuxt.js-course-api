@@ -16,6 +16,14 @@ import (
 )
 
 func InitialApplication(mongoURI string, timeout time.Duration) (App, error) {
-	wire.Build(configs.NewConfig, database.NewDatabase, models.NewUserRepository, utils.NewValidateTranslation, controllers.NewUserHandler, NewAppDatabase)
+	wire.Build(
+		configs.NewConfig,
+		database.NewDatabase,
+		utils.NewValidateTranslation,
+		models.NewUserRepository,
+		controllers.NewUserHandler,
+		models.NewMovieRepository,
+		controllers.NewMovieHandler,
+		NewAppDatabase)
 	return App{}, nil
 }

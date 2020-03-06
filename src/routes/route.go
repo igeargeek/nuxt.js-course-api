@@ -10,5 +10,8 @@ import (
 
 func UserRoute(router *gin.RouterGroup, userHandler controllers.UserHandler) {
 	router.POST("/register", userHandler.RegisterUserPost)
-	router.GET("/", userHandler.ListOfUsersGet)
+}
+
+func MovieRoute(router *gin.RouterGroup, movieHandler controllers.MovieHandler) {
+	router.POST("/", movieHandler.CreateMoviePost)
 }
