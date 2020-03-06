@@ -2,6 +2,9 @@ package utils
 
 import (
 	"time"
+
+	ut "github.com/go-playground/universal-translator"
+	"gopkg.in/go-playground/validator.v9"
 )
 
 type NotFound struct {
@@ -78,4 +81,15 @@ func ResponseErrorFields(errors []map[string]string) UnProcessEntity {
 		Message: "Invalid Fields",
 		Errors:  errors,
 	}
+}
+
+func ResponseErrorValidation(translator ut.Translator, err error) UnProcessEntity {
+	errs := err.(validator.ValidationErrors)
+	invalidFields := make([]map[string]string, 0)
+	for _, e := range errs {
+		errors := map[string]string{}
+		errors[ToSnakeCase(e.Field())] = e.Translate(translator)
+		invalidFields = append(invalidFields, errors)
+	}
+	return ResponseErrorFields(invalidFields)
 }

@@ -8,7 +8,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	ut "github.com/go-playground/universal-translator"
-	"gopkg.in/go-playground/validator.v9"
 )
 
 type MovieHandler struct {
@@ -26,14 +25,7 @@ func NewMovieHandler(repository models.MovieRepository, validator ut.Translator)
 func (handler *MovieHandler) CreateMoviePost(c *gin.Context) {
 	var movie models.Movie
 	if err := c.ShouldBind(&movie); err != nil {
-		errs := err.(validator.ValidationErrors)
-		invalidFields := make([]map[string]string, 0)
-		for _, e := range errs {
-			errors := map[string]string{}
-			errors[utils.ToSnakeCase(e.Field())] = e.Translate(handler.Validator)
-			invalidFields = append(invalidFields, errors)
-		}
-		c.JSON(http.StatusUnprocessableEntity, utils.ResponseErrorFields(invalidFields))
+		c.JSON(http.StatusUnprocessableEntity, utils.ResponseErrorValidation(handler.Validator, err))
 		return
 	}
 	id, err := handler.Service.Create(&movie)

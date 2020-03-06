@@ -8,7 +8,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	ut "github.com/go-playground/universal-translator"
-	"gopkg.in/go-playground/validator.v9"
 )
 
 type UserHandler struct {
@@ -26,14 +25,7 @@ func NewUserHandler(repository models.UserRepository, validator ut.Translator) U
 func (handler *UserHandler) RegisterUserPost(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBind(&user); err != nil {
-		errs := err.(validator.ValidationErrors)
-		invalidFields := make([]map[string]string, 0)
-		for _, e := range errs {
-			errors := map[string]string{}
-			errors[utils.ToSnakeCase(e.Field())] = e.Translate(handler.Validator)
-			invalidFields = append(invalidFields, errors)
-		}
-		c.JSON(http.StatusUnprocessableEntity, utils.ResponseErrorFields(invalidFields))
+		c.JSON(http.StatusUnprocessableEntity, utils.ResponseErrorValidation(handler.Validator, err))
 		return
 	}
 	id, err := handler.Service.Create(&user)
