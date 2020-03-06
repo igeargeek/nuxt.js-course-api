@@ -25,8 +25,7 @@ func NewUserHandler(repository models.UserRepository, validator ut.Translator) U
 
 func (handler *UserHandler) RegisterUserPost(c *gin.Context) {
 	var user models.User
-	var err error
-	if err = c.ShouldBind(&user); err != nil {
+	if err := c.ShouldBind(&user); err != nil {
 		errs := err.(validator.ValidationErrors)
 		invalidFields := make([]map[string]string, 0)
 		for _, e := range errs {
@@ -37,8 +36,15 @@ func (handler *UserHandler) RegisterUserPost(c *gin.Context) {
 		c.JSON(http.StatusUnprocessableEntity, utils.ResponseErrorFields(invalidFields))
 		return
 	}
+	id, err := handler.Service.Create(&user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
+	}
 
-	c.JSON(http.StatusCreated, utils.ResponseMessage("Create Successfully."))
+	c.JSON(http.StatusCreated, utils.ResponseObject(gin.H{
+		"message": "Created Successful",
+		"id":      id,
+	}))
 }
 
 func (handler *UserHandler) ListOfUsersGet(c *gin.Context) {
