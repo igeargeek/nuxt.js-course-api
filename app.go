@@ -27,12 +27,6 @@ func NewAppDatabase(userHandler controllers.UserHandler, movieHandler controller
 }
 
 func main() {
-	loc, err := time.LoadLocation("Asia/Bangkok")
-	if err != nil {
-		return
-	}
-	time.Local = loc
-
 	mongoURI := fmt.Sprintf(os.Getenv("MONGO_URI"))
 	app, err := InitialApplication(mongoURI, 1*time.Second)
 	if err != nil {

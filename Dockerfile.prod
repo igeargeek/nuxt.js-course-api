@@ -11,6 +11,8 @@ RUN wire
 RUN go build -o main
 
 FROM alpine
+RUN apk --no-cache add tzdata
+ENV TZ Asia/Bangkok
 WORKDIR /app
 COPY --from=build /usr/local/go/src/app/main .
 ENTRYPOINT ./main
