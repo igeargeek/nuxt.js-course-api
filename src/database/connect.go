@@ -29,5 +29,5 @@ func NewDatabase(config configs.ConfigDatabase) *mongo.Database {
 		log.Fatal("ping error", err)
 	}
 
-	return client.Database(os.Getenv("database"))
+	return client.Database(os.Getenv("MONGO_DBNAME"))
 }

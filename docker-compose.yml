@@ -14,8 +14,7 @@ services:
     links:
       - db
     environment:
-      port: 8000
-      database: "movie_ticket"
+      MONGO_DBNAME: "movie_ticket"
       MONGO_URI: "mongodb://db:27017"
 
   db:
