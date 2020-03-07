@@ -3,14 +3,15 @@
 - [x] [การ import local package](https://riptutorial.com/go/example/22421/importing-packages)
 - [x] POST /movies
 - [x] GET /movies/:id
-- [ ] GET /movies
-- [ ] PUT /movies/:id
+- [x] GET /movies
+- [x] PUT /movies/:id
 - [x] DELETE /movies/:id
 
-- [ ] POST /movies/:id/_reserve
-- [ ] GET /me/reservations/:id
-- [ ] GET /me/reservations ~ รอ auth
+- [x] POST /movies/:id/_reserve
+- [x] GET /reservations/:id
+- [x] GET /reservations
 
-- [ ] Add Dockerfile.prod for production building
-- [ ] Config github action for create a image and push to dockerhub
-- [ ] Deploy to production
+- [x] Add Dockerfile.prod for production building
+- [x] Config github action for create a image and push to dockerhub
+- [x] Deploy to production
+- [ ] Move some logic when auth has done

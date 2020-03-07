@@ -33,11 +33,20 @@ func (handler *MovieHandler) ShowOneMovieGet(c *gin.Context) {
 	c.JSON(http.StatusOK, utils.ResponseObject(movie))
 }
 
+func (handler *MovieHandler) ShowAllMovieGet(c *gin.Context) {
+	movies, _ := handler.Service.GetAll()
+	c.JSON(http.StatusOK, utils.ResponseObject(gin.H{
+		"message": "Data retrieval successfully",
+		"total":   len(movies),
+		"data":    movies,
+	}))
+}
+
 func (handler *MovieHandler) RemoveOneMovieDelete(c *gin.Context) {
 	id := c.Param("id")
 	err := handler.Service.DeleteID(id)
 	if err != nil {
-		c.JSON(http.StatusNotFound, utils.ResponseServerError("Something went wrong."))
+		c.JSON(http.StatusNotFound, utils.ResponseServerError("Not found!"))
 		return
 	}
 
@@ -60,4 +69,20 @@ func (handler *MovieHandler) CreateMoviePost(c *gin.Context) {
 		"message": "Created Successful",
 		"id":      id,
 	}))
+}
+
+func (handler *MovieHandler) EditMoviePut(c *gin.Context) {
+	id := c.Param("id")
+	var movie models.Movie
+	if err := c.ShouldBind(&movie); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, utils.ResponseErrorValidation(handler.Validator, err))
+		return
+	}
+	err := handler.Service.Edit(id, &movie)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
+		return
+	}
+
+	c.JSON(http.StatusAccepted, movie)
 }
