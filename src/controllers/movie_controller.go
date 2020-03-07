@@ -61,3 +61,19 @@ func (handler *MovieHandler) CreateMoviePost(c *gin.Context) {
 		"id":      id,
 	}))
 }
+
+func (handler *MovieHandler) EditMoviePut(c *gin.Context) {
+	id := c.Param("id")
+	var movie models.Movie
+	if err := c.ShouldBind(&movie); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, utils.ResponseErrorValidation(handler.Validator, err))
+		return
+	}
+	err := handler.Service.Edit(id, &movie)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
+		return
+	}
+
+	c.JSON(http.StatusAccepted, movie)
+}

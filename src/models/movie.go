@@ -10,8 +10,9 @@ import (
 
 type MovieReporer interface {
 	GetID(string) (Movie, error)
-	Create(movie *Movie) (primitive.ObjectID, error)
+	Create(*Movie) (primitive.ObjectID, error)
 	DeleteID(string) error
+	Edit(string, *Movie) error
 }
 
 type MovieRepository struct {
@@ -30,10 +31,9 @@ type Movie struct {
 
 func (repo *MovieRepository) GetID(id string) (Movie, error) {
 	var movie Movie
-	collection := repo.DB.Database("movie_ticket").Collection("movies")
 	_id, _ := primitive.ObjectIDFromHex(id)
 	filter := bson.M{"_id": _id}
-	err := collection.FindOne(context.TODO(), filter).Decode(&movie)
+	err := repo.DB.FindOne(context.TODO(), filter).Decode(&movie)
 	if err != nil {
 		return movie, err
 	}
@@ -41,8 +41,7 @@ func (repo *MovieRepository) GetID(id string) (Movie, error) {
 }
 
 func (repo *MovieRepository) Create(movie *Movie) (primitive.ObjectID, error) {
-	collection := repo.DB.Database("movie_ticket").Collection("movies")
-	res, err := collection.InsertOne(context.TODO(), bson.M{
+	res, err := repo.DB.InsertOne(context.TODO(), bson.M{
 		"name":        movie.Name,
 		"genre":       movie.Genre,
 		"posterUrl":   movie.PosterURL,
@@ -57,11 +56,30 @@ func (repo *MovieRepository) Create(movie *Movie) (primitive.ObjectID, error) {
 	return res.InsertedID.(primitive.ObjectID), nil
 }
 
-func (repo *MovieRepository) DeleteID(id string) error {
-	collection := repo.DB.Database("movie_ticket").Collection("movies")
+func (repo *MovieRepository) Edit(id string, movie *Movie) error {
 	_id, _ := primitive.ObjectIDFromHex(id)
 	filter := bson.M{"_id": _id}
-	_, err := collection.DeleteOne(context.TODO(), filter)
+	err := repo.DB.FindOneAndUpdate(context.TODO(), filter, bson.M{
+		"$set": bson.M{
+			"name":        movie.Name,
+			"genre":       movie.Genre,
+			"posterUrl":   movie.PosterURL,
+			"youtubeUrl":  movie.YoutubeURL,
+			"description": movie.Description,
+			"duration":    movie.Duration,
+		},
+	})
+	if err != nil {
+		return err.Err()
+	}
+
+	return nil
+}
+
+func (repo *MovieRepository) DeleteID(id string) error {
+	_id, _ := primitive.ObjectIDFromHex(id)
+	filter := bson.M{"_id": _id}
+	_, err := repo.DB.DeleteOne(context.TODO(), filter)
 	if err != nil {
 		return err
 	}

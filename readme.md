@@ -4,7 +4,7 @@
 - [x] POST /movies
 - [x] GET /movies/:id
 - [ ] GET /movies
-- [ ] PUT /movies/:id
+- [x] PUT /movies/:id
 - [x] DELETE /movies/:id
 
 - [ ] POST /movies/:id/_reserve
