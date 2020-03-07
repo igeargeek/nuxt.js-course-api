@@ -13,3 +13,9 @@ func NewMovieRepository(db *mongo.Database) MovieReporer {
 		DB: db.Collection("movies"),
 	}
 }
+
+func NewReservationRepository(db *mongo.Database) ReservationReporer {
+	return &ReservationRepository{
+		DB: db.Collection("reservations"),
+	}
+}

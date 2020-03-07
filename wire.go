@@ -24,6 +24,8 @@ func InitialApplication(mongoURI string, timeout time.Duration) (App, error) {
 		controllers.NewUserHandler,
 		models.NewMovieRepository,
 		controllers.NewMovieHandler,
+		models.NewReservationRepository,
+		controllers.NewReservationHandler,
 		NewAppDatabase)
 	return App{}, nil
 }

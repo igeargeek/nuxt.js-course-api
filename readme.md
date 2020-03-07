@@ -7,7 +7,7 @@
 - [x] PUT /movies/:id
 - [x] DELETE /movies/:id
 
-- [ ] POST /movies/:id/_reserve
+- [x] POST /movies/:id/_reserve
 - [ ] GET /me/reservations/:id
 - [ ] GET /me/reservations ~ รอ auth
 

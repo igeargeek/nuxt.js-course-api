@@ -13,14 +13,16 @@ import (
 )
 
 type App struct {
-	UserHandler  controllers.UserHandler
-	MovieHandler controllers.MovieHandler
+	UserHandler        controllers.UserHandler
+	MovieHandler       controllers.MovieHandler
+	ReservationHandler controllers.ReservationHandler
 }
 
-func NewAppDatabase(userHandler controllers.UserHandler, movieHandler controllers.MovieHandler) App {
+func NewAppDatabase(userHandler controllers.UserHandler, movieHandler controllers.MovieHandler, reservationHandler controllers.ReservationHandler) App {
 	return App{
-		UserHandler:  userHandler,
-		MovieHandler: movieHandler,
+		UserHandler:        userHandler,
+		MovieHandler:       movieHandler,
+		ReservationHandler: reservationHandler,
 	}
 }
 
@@ -37,7 +39,7 @@ func main() {
 	routes.UserRoute(userRoute, app.UserHandler)
 
 	movieRoute := router.Group("/movies")
-	routes.MovieRoute(movieRoute, app.MovieHandler)
+	routes.MovieRoute(movieRoute, app.MovieHandler, app.ReservationHandler)
 
 	portListen := "8000"
 	if port := os.Getenv("PORT"); port != "" {

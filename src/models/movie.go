@@ -81,12 +81,13 @@ func (repo *MovieRepository) Edit(id string, movie *Movie) error {
 	filter := bson.M{"_id": _id}
 	err := repo.DB.FindOneAndUpdate(context.TODO(), filter, bson.M{
 		"$set": bson.M{
-			"name":        movie.Name,
-			"genre":       movie.Genre,
-			"posterUrl":   movie.PosterURL,
-			"youtubeUrl":  movie.YoutubeURL,
-			"description": movie.Description,
-			"duration":    movie.Duration,
+			"name":         movie.Name,
+			"genre":        movie.Genre,
+			"posterUrl":    movie.PosterURL,
+			"youtubeUrl":   movie.YoutubeURL,
+			"description":  movie.Description,
+			"duration":     movie.Duration,
+			"reservedSeat": movie.ReservedSeat,
 		},
 	})
 	if err != nil {
