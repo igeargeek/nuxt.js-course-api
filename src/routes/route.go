@@ -21,3 +21,7 @@ func MovieRoute(router *gin.RouterGroup, movieHandler controllers.MovieHandler, 
 	router.GET("/", movieHandler.ShowAllMovieGet)
 	router.POST("/:id/_reseve", reservationHandler.CreateReservationPost)
 }
+
+func ReservationRoute(router *gin.RouterGroup, reservationHandler controllers.ReservationHandler) {
+	router.GET("/:id", reservationHandler.ShowOneReservationGet)
+}

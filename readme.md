@@ -8,8 +8,8 @@
 - [x] DELETE /movies/:id
 
 - [x] POST /movies/:id/_reserve
-- [ ] GET /me/reservations/:id
-- [ ] GET /me/reservations ~ รอ auth
+- [x] GET /reservations/:id
+- [ ] GET /reservations ~ รอ auth
 
 - [ ] Add Dockerfile.prod for production building
 - [ ] Config github action for create a image and push to dockerhub

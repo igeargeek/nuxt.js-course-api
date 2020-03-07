@@ -10,7 +10,7 @@ import (
 )
 
 type ReservationReporer interface {
-	// GetID(string) (Movie, error)
+	GetID(string, string) (Reservation, error)
 	Create(*Reservation) (primitive.ObjectID, error)
 	// DeleteID(string) error
 	// Edit(string, *Movie) error
@@ -29,16 +29,16 @@ type Reservation struct {
 	UpdatedAt time.Time `bson:"updated_at"`
 }
 
-// func (repo *MovieRepository) GetID(id string) (Movie, error) {
-// 	var movie Movie
-// 	_id, _ := primitive.ObjectIDFromHex(id)
-// 	filter := bson.M{"_id": _id}
-// 	err := repo.DB.FindOne(context.TODO(), filter).Decode(&movie)
-// 	if err != nil {
-// 		return movie, err
-// 	}
-// 	return movie, nil
-// }
+func (repo *ReservationRepository) GetID(id, userId string) (Reservation, error) {
+	var reservation Reservation
+	_id, _ := primitive.ObjectIDFromHex(id)
+	filter := bson.M{"_id": _id, "userId": userId}
+	err := repo.DB.FindOne(context.TODO(), filter).Decode(&reservation)
+	if err != nil {
+		return reservation, err
+	}
+	return reservation, nil
+}
 
 // func (repo *MovieRepository) GetAll() ([]*Movie, error) {
 // 	cur, err := repo.DB.Find(context.TODO(), bson.D{})

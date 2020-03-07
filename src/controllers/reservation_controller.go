@@ -24,16 +24,26 @@ func NewReservationHandler(movieRepository models.MovieReporer, reservationRepos
 	}
 }
 
-// func (handler *MovieHandler) ShowOneMovieGet(c *gin.Context) {
-// 	id := c.Param("id")
-// 	movie, err := handler.Service.GetID(id)
-// 	if err != nil {
-// 		c.JSON(http.StatusNotFound, utils.ResponseServerError("Not found!"))
-// 		return
-// 	}
+func (handler *ReservationHandler) ShowOneReservationGet(c *gin.Context) {
+	id := c.Param("id")
+	userId := "123" // mock user id
+	reservation, err := handler.ReservationService.GetID(id, userId)
+	if err != nil {
+		c.JSON(http.StatusNotFound, utils.ResponseServerError("Not found!"))
+		return
+	}
 
-// 	c.JSON(http.StatusOK, utils.ResponseObject(movie))
-// }
+	movie, err := handler.MovieService.GetID(reservation.MovieId)
+	if err != nil {
+		c.JSON(http.StatusNotFound, utils.ResponseServerError("Not found!"))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.ResponseObject(gin.H{
+		"reservation": reservation,
+		"movie":       movie,
+	}))
+}
 
 // func (handler *MovieHandler) ShowAllMovieGet(c *gin.Context) {
 // 	movies, _ := handler.Service.GetAll()

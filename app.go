@@ -41,6 +41,9 @@ func main() {
 	movieRoute := router.Group("/movies")
 	routes.MovieRoute(movieRoute, app.MovieHandler, app.ReservationHandler)
 
+	reservationRoute := router.Group("/reservations")
+	routes.ReservationRoute(reservationRoute, app.ReservationHandler)
+
 	portListen := "8000"
 	if port := os.Getenv("PORT"); port != "" {
 		portListen = port
