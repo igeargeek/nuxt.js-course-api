@@ -31,3 +31,7 @@ func (repo *MovieRepository) Create(movie *Movie) (primitive.ObjectID, error) {
 
 	return res.InsertedID.(primitive.ObjectID), nil
 }
+
+func (repo *MovieRepository) GetID(number int) (int, error) {
+	return 0, nil
+}

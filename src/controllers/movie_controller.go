@@ -11,11 +11,11 @@ import (
 )
 
 type MovieHandler struct {
-	Service   models.MovieRepository
+	Service   models.MovieReporer
 	Validator ut.Translator
 }
 
-func NewMovieHandler(repository models.MovieRepository, validator ut.Translator) MovieHandler {
+func NewMovieHandler(repository models.MovieReporer, validator ut.Translator) MovieHandler {
 	return MovieHandler{
 		Service:   repository,
 		Validator: validator,
