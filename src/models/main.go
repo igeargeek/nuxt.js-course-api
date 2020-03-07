@@ -4,7 +4,9 @@ import "go.mongodb.org/mongo-driver/mongo"
 
 func NewUserRepository(db *mongo.Database) UserReporer {
 	return &UserRepository{
-		DB: db.Collection("users"),
+		DB:             db.Collection("users"),
+		DBAccessToken:  db.Collection("access_token"),
+		DBRefreshToken: db.Collection("refresh_token"),
 	}
 }
 

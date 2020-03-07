@@ -14,11 +14,30 @@ import (
 type UserReporer interface {
 	GetID(ID primitive.ObjectID) (User, error)
 	Create(user *User) (primitive.ObjectID, error)
+	CreateAccessToken(token *AccessToken) error
+	CreateRefreshToken(token *RefreshToken) error
 	FindByUsername(username string) (User, error)
+	GetAccessToken(token string) (AccessToken, error)
+	GetRefreshToken(token string) (RefreshToken, error)
+	RemoveRefreshToken(ID primitive.ObjectID) error
 }
 
 type UserRepository struct {
-	DB *mongo.Collection
+	DB             *mongo.Collection
+	DBAccessToken  *mongo.Collection
+	DBRefreshToken *mongo.Collection
+}
+
+type AccessToken struct {
+	ID     primitive.ObjectID `bson:"_id",omitempty`
+	UserID primitive.ObjectID `bson:"userId",omitempty`
+	Token  string             `bson:"accessToken"`
+}
+
+type RefreshToken struct {
+	ID     primitive.ObjectID `bson:"_id",omitempty`
+	UserID primitive.ObjectID `bson:"userId",omitempty`
+	Token  string             `bson:"refreshToken"`
 }
 
 type User struct {
@@ -72,4 +91,51 @@ func (repo *UserRepository) Create(user *User) (primitive.ObjectID, error) {
 	}
 
 	return res.InsertedID.(primitive.ObjectID), nil
+}
+
+func (repo *UserRepository) CreateAccessToken(token *AccessToken) error {
+	_, err := repo.DBAccessToken.InsertOne(context.TODO(), bson.M{
+		"userId":      token.UserID,
+		"accessToken": token.Token,
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (repo *UserRepository) CreateRefreshToken(token *RefreshToken) error {
+	_, err := repo.DBRefreshToken.InsertOne(context.TODO(), bson.M{
+		"userId":       token.UserID,
+		"refreshToken": token.Token,
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (repo *UserRepository) GetAccessToken(token string) (AccessToken, error) {
+	var accessToken AccessToken
+	err := repo.DBAccessToken.FindOne(context.TODO(), bson.D{{"accessToken", token}}).Decode(&accessToken)
+	if err == nil {
+		return accessToken, nil
+	}
+	return accessToken, err
+}
+
+func (repo *UserRepository) GetRefreshToken(token string) (RefreshToken, error) {
+	var refreshToken RefreshToken
+	err := repo.DBRefreshToken.FindOne(context.TODO(), bson.D{{"refreshToken", token}}).Decode(&refreshToken)
+	if err == nil {
+		return refreshToken, nil
+	}
+	return refreshToken, err
+}
+
+func (repo *UserRepository) RemoveRefreshToken(id primitive.ObjectID) error {
+	_, err := repo.DBRefreshToken.DeleteOne(context.TODO(), bson.D{{"_id", id}})
+	return err
 }

@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -8,8 +9,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var accessKey = []byte("thisisasecretkeyaccesstoken")
-var refreshKey = []byte("thisisasecretkeyrefreshtoken")
+var AccessKey = []byte(os.Getenv("ACCESS_TOKEN_SECRET"))
+var RefreshKey = []byte(os.Getenv("REFRESH_TOKEN_SECRET"))
 
 const AccessTokenMinute = 24 * 60
 const RefreshTokenMinute = 24 * 7 * 60
@@ -43,7 +44,7 @@ func CheckPasswordHash(password, hash string) bool {
 
 func GenerateToken(claim *Claims) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
-	tokenString, err := token.SignedString(accessKey)
+	tokenString, err := token.SignedString(AccessKey)
 	if err != nil {
 		return "", err
 	}
@@ -52,7 +53,7 @@ func GenerateToken(claim *Claims) (string, error) {
 
 func GenerateRefreshToken(claim *RefreshTokenClaims) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
-	tokenString, err := token.SignedString(refreshKey)
+	tokenString, err := token.SignedString(RefreshKey)
 	if err != nil {
 		return "", err
 	}

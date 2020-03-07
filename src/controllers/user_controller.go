@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -65,8 +64,25 @@ func (handler *UserHandler) LoginUserPost(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie("access_token", accessToken, utils.AccessTokenMinute, "/", "localhost", false, true)
-	c.SetCookie("refresh_token", refreshToken, utils.RefreshTokenMinute, "/", "localhost", false, true)
+	mAccessToken := &models.AccessToken{
+		UserID: user.ID,
+		Token:  accessToken,
+	}
+	err = handler.Service.CreateAccessToken(mAccessToken)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
+		return
+	}
+
+	mRefreshToken := &models.RefreshToken{
+		UserID: user.ID,
+		Token:  refreshToken,
+	}
+	err = handler.Service.CreateRefreshToken(mRefreshToken)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
+		return
+	}
 
 	c.JSON(http.StatusOK, utils.ResponseToken("Login successful.",
 		accessToken,
@@ -107,32 +123,30 @@ func (handler *UserHandler) RegisterUserPost(c *gin.Context) {
 }
 
 func (handler *UserHandler) RefreshTokenPost(c *gin.Context) {
-	refreshToken := c.GetHeader("refresh_token")
+	oldRefreshToken := c.GetHeader("refresh_token")
 
-	if refreshToken == "" {
+	if oldRefreshToken == "" {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ResponseMessage("Unauthorized."))
 		return
 	}
 
-	refreshTokenCookie, err := c.Cookie("refresh_token")
+	token, err := handler.Service.GetRefreshToken(oldRefreshToken)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ResponseMessage("Unauthorized."))
-		return
-	}
-
-	if refreshTokenCookie != refreshToken {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ResponseMessage("Unauthorized."))
+		if err == mongo.ErrNoDocuments {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ResponseMessage("Unauthorized."))
+			return
+		}
+		c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
 		return
 	}
 
 	claims := &utils.Claims{}
 
-	parseToken, err := jwt.ParseWithClaims(refreshTokenCookie, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte("thisisasecretkeyrefreshtoken"), nil
+	parseToken, err := jwt.ParseWithClaims(token.Token, claims, func(token *jwt.Token) (interface{}, error) {
+		return utils.RefreshKey, nil
 	})
 
 	if err != nil {
-		fmt.Println(err)
 		if err == jwt.ErrSignatureInvalid {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ResponseMessage("Unauthorized."))
 			return
@@ -148,7 +162,6 @@ func (handler *UserHandler) RefreshTokenPost(c *gin.Context) {
 
 	user, err := handler.Service.GetID(claims.ID)
 	if err != nil {
-		fmt.Println(err)
 		if err == mongo.ErrNoDocuments {
 			c.JSON(http.StatusUnauthorized, utils.ResponseMessage("Username or password incorrect."))
 			return
@@ -166,13 +179,35 @@ func (handler *UserHandler) RefreshTokenPost(c *gin.Context) {
 	)
 
 	if err != nil {
-		fmt.Println(err)
 		c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
 		return
 	}
 
-	c.SetCookie("access_token", accessToken, utils.AccessTokenMinute, "/", "localhost", false, true)
-	c.SetCookie("refresh_token", refreshToken, utils.RefreshTokenMinute, "/", "localhost", false, true)
+	mAccessToken := &models.AccessToken{
+		UserID: user.ID,
+		Token:  accessToken,
+	}
+	err = handler.Service.CreateAccessToken(mAccessToken)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
+		return
+	}
+
+	mRefreshToken := &models.RefreshToken{
+		UserID: user.ID,
+		Token:  refreshToken,
+	}
+	err = handler.Service.CreateRefreshToken(mRefreshToken)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
+		return
+	}
+
+	err = handler.Service.RemoveRefreshToken(token.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
+		return
+	}
 
 	c.JSON(http.StatusOK, utils.ResponseToken("Refresh token success.",
 		accessToken,
@@ -189,25 +224,23 @@ func (handler *UserHandler) PayloadTokenPost(c *gin.Context) {
 	}
 	token = strings.TrimSpace(splitToken[1])
 
-	tokenCookie, err := c.Cookie("access_token")
+	accessToken, err := handler.Service.GetAccessToken(token)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ResponseMessage("Unauthorized."))
-		return
-	}
-
-	if token != tokenCookie {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ResponseMessage("Unauthorized."))
+		if err == mongo.ErrNoDocuments {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ResponseMessage("Unauthorized."))
+			return
+		}
+		c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
 		return
 	}
 
 	claims := &utils.Claims{}
 
-	parseToken, err := jwt.ParseWithClaims(tokenCookie, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte("thisisasecretkeyaccesstoken"), nil
+	parseToken, err := jwt.ParseWithClaims(accessToken.Token, claims, func(token *jwt.Token) (interface{}, error) {
+		return utils.AccessKey, nil
 	})
 
 	if err != nil {
-		fmt.Println(err)
 		if err == jwt.ErrSignatureInvalid {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ResponseMessage("Unauthorized."))
 			return

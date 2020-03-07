@@ -29,7 +29,6 @@ func NewAppDatabase(userHandler controllers.UserHandler, movieHandler controller
 func main() {
 	loc, err := time.LoadLocation("Asia/Bangkok")
 	if err != nil {
-		fmt.Println("localtimerror", err)
 		return
 	}
 	time.Local = loc
