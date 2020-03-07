@@ -14,8 +14,6 @@ func NewValidateTranslation() ut.Translator {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		en := en.New()
 		uni := ut.New(en, en)
-		// this is usually know or extracted from http 'Accept-Language' header
-		// also see uni.FindTranslator(...)
 		trans, _ = uni.GetTranslator("en")
 		en_translations.RegisterDefaultTranslations(v, trans)
 	}

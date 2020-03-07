@@ -15,7 +15,7 @@ type MovieReporer interface {
 }
 
 type MovieRepository struct {
-	DB *mongo.Client
+	DB *mongo.Collection
 }
 
 type Movie struct {

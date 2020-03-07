@@ -2,14 +2,14 @@ package models
 
 import "go.mongodb.org/mongo-driver/mongo"
 
-func NewUserRepository(db *mongo.Client) UserRepository {
+func NewUserRepository(db *mongo.Database) UserRepository {
 	return UserRepository{
-		DB: db,
+		DB: db.Collection("users"),
 	}
 }
 
-func NewMovieRepository(db *mongo.Client) MovieRepository {
+func NewMovieRepository(db *mongo.Database) MovieRepository {
 	return MovieRepository{
-		DB: db,
+		DB: db.Collection("movies"),
 	}
 }

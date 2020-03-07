@@ -53,6 +53,7 @@ func (handler *MovieHandler) CreateMoviePost(c *gin.Context) {
 	id, err := handler.Service.Create(&movie)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
+		return
 	}
 
 	c.JSON(http.StatusCreated, utils.ResponseObject(gin.H{
