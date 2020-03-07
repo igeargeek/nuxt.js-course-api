@@ -22,6 +22,17 @@ func NewUserHandler(repository models.UserReporer, validator ut.Translator) User
 	}
 }
 
+func (handler *UserHandler) LoginUserPost(c *gin.Context) {
+	var credential struct {
+		Username string `form:"username" json:"username" binding:"required"`
+		Password string `form:"password" json:"password" binding:"required"`
+	}
+	if err := c.ShouldBind(&credential); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, utils.ResponseErrorValidation(handler.Validator, err))
+		return
+	}
+}
+
 func (handler *UserHandler) RegisterUserPost(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBind(&user); err != nil {

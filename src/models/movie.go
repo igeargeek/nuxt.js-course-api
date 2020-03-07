@@ -30,10 +30,9 @@ type Movie struct {
 
 func (repo *MovieRepository) GetID(id string) (Movie, error) {
 	var movie Movie
-	collection := repo.DB.Database("movie_ticket").Collection("movies")
 	_id, _ := primitive.ObjectIDFromHex(id)
 	filter := bson.M{"_id": _id}
-	err := collection.FindOne(context.TODO(), filter).Decode(&movie)
+	err := repo.DB.FindOne(context.TODO(), filter).Decode(&movie)
 	if err != nil {
 		return movie, err
 	}
