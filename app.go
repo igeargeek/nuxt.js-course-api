@@ -9,6 +9,7 @@ import (
 	"app/src/controllers"
 	"app/src/routes"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -34,6 +35,9 @@ func main() {
 	}
 
 	router := gin.Default()
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowOrigins = []string{"*"}
+	router.Use(cors.New(corsConfig))
 
 	userRoute := router.Group("/users")
 	routes.UserRoute(userRoute, app.UserHandler)
