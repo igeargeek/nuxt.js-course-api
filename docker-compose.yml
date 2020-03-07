@@ -14,8 +14,7 @@ services:
     links:
       - db
     environment:
-      port: 8000
-      mongo_uri: "mongodb://db:27017"
+      MONGO_URI: "mongodb://db:27017"
 
   db:
     image: mongo
