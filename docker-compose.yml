@@ -15,8 +15,8 @@ services:
       - db
     environment:
       port: 8000
-      mongo_uri: "mongodb://db:27017"
       database: "movie_ticket"
+      MONGO_URI: "mongodb://db:27017"
 
   db:
     image: mongo

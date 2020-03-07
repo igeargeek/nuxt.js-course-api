@@ -25,7 +25,7 @@ func NewAppDatabase(userHandler controllers.UserHandler, movieHandler controller
 }
 
 func main() {
-	mongoURI := fmt.Sprintf(os.Getenv("mongo_uri"))
+	mongoURI := fmt.Sprintf(os.Getenv("MONGO_URI"))
 	app, err := InitialApplication(mongoURI, 1*time.Second)
 	if err != nil {
 		log.Fatal("App initial error")
@@ -39,5 +39,9 @@ func main() {
 	movieRoute := router.Group("/movies")
 	routes.MovieRoute(movieRoute, app.MovieHandler)
 
-	router.Run(":" + os.Getenv("port"))
+	portListen := "8000"
+	if port := os.Getenv("PORT"); port != "" {
+		portListen = port
+	}
+	router.Run(":" + portListen)
 }
