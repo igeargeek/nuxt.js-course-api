@@ -33,37 +33,24 @@ func (handler *ReservationHandler) ShowOneReservationGet(c *gin.Context) {
 		return
 	}
 
-	movie, err := handler.MovieService.GetID(reservation.MovieId)
+	_, err = handler.MovieService.GetID(reservation.MovieId)
 	if err != nil {
 		c.JSON(http.StatusNotFound, utils.ResponseServerError("Not found!"))
 		return
 	}
 
-	c.JSON(http.StatusOK, utils.ResponseObject(gin.H{
-		"reservation": reservation,
-		"movie":       movie,
-	}))
+	c.JSON(http.StatusOK, utils.ResponseObject(reservation))
 }
 
-// func (handler *MovieHandler) ShowAllMovieGet(c *gin.Context) {
-// 	movies, _ := handler.Service.GetAll()
-// 	c.JSON(http.StatusOK, utils.ResponseObject(gin.H{
-// 		"message": "Data retrieval successfully",
-// 		"total":   len(movies),
-// 		"data":    movies,
-// 	}))
-// }
-
-// func (handler *MovieHandler) RemoveOneMovieDelete(c *gin.Context) {
-// 	id := c.Param("id")
-// 	err := handler.Service.DeleteID(id)
-// 	if err != nil {
-// 		c.JSON(http.StatusNotFound, utils.ResponseServerError("Not found!"))
-// 		return
-// 	}
-
-// 	c.JSON(http.StatusNoContent, gin.H{})
-// }
+func (handler *ReservationHandler) ShowAllReservationGet(c *gin.Context) {
+	userId := "123" // mock user id
+	reservations, _ := handler.ReservationService.GetAll(userId)
+	c.JSON(http.StatusOK, utils.ResponseObject(gin.H{
+		"message": "Data retrieval successfully",
+		"total":   len(reservations),
+		"data":    reservations,
+	}))
+}
 
 func (handler *ReservationHandler) CreateReservationPost(c *gin.Context) {
 	var reservation models.Reservation
@@ -86,7 +73,7 @@ func (handler *ReservationHandler) CreateReservationPost(c *gin.Context) {
 		return
 	}
 
-	id, err := handler.ReservationService.Create(&reservation)
+	id, err := handler.ReservationService.Create(&reservation, &movie)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
 		return

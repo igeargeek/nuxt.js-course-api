@@ -11,10 +11,8 @@ import (
 
 type ReservationReporer interface {
 	GetID(string, string) (Reservation, error)
-	Create(*Reservation) (primitive.ObjectID, error)
-	// DeleteID(string) error
-	// Edit(string, *Movie) error
-	// GetAll() ([]*Movie, error)
+	Create(*Reservation, *Movie) (primitive.ObjectID, error)
+	GetAll(string) ([]*Reservation, error)
 }
 
 type ReservationRepository struct {
@@ -22,11 +20,12 @@ type ReservationRepository struct {
 }
 
 type Reservation struct {
-	MovieId   string    `form:"movieId" json:"movieId" binding:"required"`
-	SeatNo    []string  `form:"seatNo" json:"seatNo" binding:"required"`
-	UserId    string    `form:"userId" json:"userId" binding:"required"`
-	CreatedAt time.Time `bson:"created_at"`
-	UpdatedAt time.Time `bson:"updated_at"`
+	MovieId     string    `form:"movieId" json:"movieId" binding:"required"`
+	SeatNo      []string  `form:"seatNo" json:"seatNo" binding:"required"`
+	UserId      string    `form:"userId" json:"userId" binding:"required"`
+	CreatedAt   time.Time `bson:"created_at"`
+	UpdatedAt   time.Time `bson:"updated_at"`
+	MovieDetail *Movie    `json:"movieDetail,omitempty"`
 }
 
 func (repo *ReservationRepository) GetID(id, userId string) (Reservation, error) {
@@ -40,32 +39,35 @@ func (repo *ReservationRepository) GetID(id, userId string) (Reservation, error)
 	return reservation, nil
 }
 
-// func (repo *MovieRepository) GetAll() ([]*Movie, error) {
-// 	cur, err := repo.DB.Find(context.TODO(), bson.D{})
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	var results []*Movie
-// 	for cur.Next(context.TODO()) {
-// 		var elem *Movie
-// 		err := cur.Decode(&elem)
-// 		if err != nil {
-// 			return results, err
-// 		}
+func (repo *ReservationRepository) GetAll(userId string) ([]*Reservation, error) {
+	cur, err := repo.DB.Find(context.TODO(), bson.M{
+		"userId": userId,
+	})
+	if err != nil {
+		return nil, err
+	}
+	var results []*Reservation
+	for cur.Next(context.TODO()) {
+		var elem *Reservation
+		err := cur.Decode(&elem)
+		if err != nil {
+			return results, err
+		}
 
-// 		results = append(results, elem)
+		results = append(results, elem)
 
-// 	}
-// 	return results, nil
-// }
+	}
+	return results, nil
+}
 
-func (repo *ReservationRepository) Create(reservation *Reservation) (primitive.ObjectID, error) {
+func (repo *ReservationRepository) Create(reservation *Reservation, movie *Movie) (primitive.ObjectID, error) {
 	res, err := repo.DB.InsertOne(context.TODO(), bson.M{
-		"movieId":    reservation.MovieId,
-		"seatNo":     reservation.SeatNo,
-		"userId":     reservation.UserId,
-		"created_at": time.Now(),
-		"updated_at": time.Now(),
+		"movieId":     reservation.MovieId,
+		"seatNo":      reservation.SeatNo,
+		"userId":      reservation.UserId,
+		"created_at":  time.Now(),
+		"updated_at":  time.Now(),
+		"movieDetail": movie,
 	})
 	if err != nil {
 		return primitive.NilObjectID, err

@@ -24,4 +24,5 @@ func MovieRoute(router *gin.RouterGroup, movieHandler controllers.MovieHandler, 
 
 func ReservationRoute(router *gin.RouterGroup, reservationHandler controllers.ReservationHandler) {
 	router.GET("/:id", reservationHandler.ShowOneReservationGet)
+	router.GET("/", reservationHandler.ShowAllReservationGet)
 }

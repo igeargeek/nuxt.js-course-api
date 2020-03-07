@@ -9,7 +9,7 @@
 
 - [x] POST /movies/:id/_reserve
 - [x] GET /reservations/:id
-- [ ] GET /reservations ~ รอ auth
+- [x] GET /reservations
 
 - [ ] Add Dockerfile.prod for production building
 - [ ] Config github action for create a image and push to dockerhub
