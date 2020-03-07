@@ -35,9 +35,7 @@ func main() {
 	}
 
 	router := gin.Default()
-	corsConfig := cors.DefaultConfig()
-	corsConfig.AllowOrigins = []string{"*"}
-	router.Use(cors.New(corsConfig))
+	router.Use(cors.Default())
 
 	userRoute := router.Group("/users")
 	routes.UserRoute(userRoute, app.UserHandler)
