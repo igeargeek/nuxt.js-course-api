@@ -11,6 +11,7 @@
 - [x] GET /reservations/:id
 - [x] GET /reservations
 
-- [ ] Add Dockerfile.prod for production building
-- [ ] Config github action for create a image and push to dockerhub
-- [ ] Deploy to production
+- [x] Add Dockerfile.prod for production building
+- [x] Config github action for create a image and push to dockerhub
+- [x] Deploy to production
+- [ ] Move some logic when auth has done
