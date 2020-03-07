@@ -15,3 +15,10 @@
 - [x] Config github action for create a image and push to dockerhub
 - [x] Deploy to production
 - [ ] Move some logic when auth has done
+
+## เบส / TODO
+
+- [x] POST /users/register
+- [x] POST /users/login
+- [x] POST /users/refresh-token
+- [x] POST /users/payload
