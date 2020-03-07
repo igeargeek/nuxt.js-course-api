@@ -21,4 +21,5 @@
 - [x] POST /users/register
 - [x] POST /users/login
 - [x] POST /users/refresh-token
-- [x] POST /users/payload
+- [ ] POST /users/payload -> ปรับเป็น GET
+- [ ] สร้าง utils เรื่องการแกะ jwt ให้ controller อื่นใช้งานร่วมกัน
