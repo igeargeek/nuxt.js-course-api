@@ -22,6 +22,28 @@ func NewMovieHandler(repository models.MovieReporer, validator ut.Translator) Mo
 	}
 }
 
+func (handler *MovieHandler) ShowOneMovieGet(c *gin.Context) {
+	id := c.Param("id")
+	movie, err := handler.Service.GetID(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, utils.ResponseServerError("Not found!"))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.ResponseObject(movie))
+}
+
+func (handler *MovieHandler) RemoveOneMovieDelete(c *gin.Context) {
+	id := c.Param("id")
+	err := handler.Service.DeleteID(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, utils.ResponseServerError("Something went wrong."))
+		return
+	}
+
+	c.JSON(http.StatusNoContent, gin.H{})
+}
+
 func (handler *MovieHandler) CreateMoviePost(c *gin.Context) {
 	var movie models.Movie
 	if err := c.ShouldBind(&movie); err != nil {

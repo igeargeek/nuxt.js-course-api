@@ -14,4 +14,6 @@ func UserRoute(router *gin.RouterGroup, userHandler controllers.UserHandler) {
 
 func MovieRoute(router *gin.RouterGroup, movieHandler controllers.MovieHandler) {
 	router.POST("/", movieHandler.CreateMoviePost)
+	router.GET("/:id", movieHandler.ShowOneMovieGet)
+	router.DELETE("/:id", movieHandler.RemoveOneMovieDelete)
 }
