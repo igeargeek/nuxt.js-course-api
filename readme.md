@@ -3,7 +3,7 @@
 - [x] [การ import local package](https://riptutorial.com/go/example/22421/importing-packages)
 - [x] POST /movies
 - [x] GET /movies/:id
-- [ ] GET /movies
+- [x] GET /movies
 - [x] PUT /movies/:id
 - [x] DELETE /movies/:id
 

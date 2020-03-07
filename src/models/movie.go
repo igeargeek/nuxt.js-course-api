@@ -13,6 +13,7 @@ type MovieReporer interface {
 	Create(*Movie) (primitive.ObjectID, error)
 	DeleteID(string) error
 	Edit(string, *Movie) error
+	GetAll() ([]*Movie, error)
 }
 
 type MovieRepository struct {
@@ -38,6 +39,25 @@ func (repo *MovieRepository) GetID(id string) (Movie, error) {
 		return movie, err
 	}
 	return movie, nil
+}
+
+func (repo *MovieRepository) GetAll() ([]*Movie, error) {
+	cur, err := repo.DB.Find(context.TODO(), bson.D{})
+	if err != nil {
+		return nil, err
+	}
+	var results []*Movie
+	for cur.Next(context.TODO()) {
+		var elem *Movie
+		err := cur.Decode(&elem)
+		if err != nil {
+			return results, err
+		}
+
+		results = append(results, elem)
+
+	}
+	return results, nil
 }
 
 func (repo *MovieRepository) Create(movie *Movie) (primitive.ObjectID, error) {

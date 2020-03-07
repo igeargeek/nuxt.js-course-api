@@ -33,11 +33,20 @@ func (handler *MovieHandler) ShowOneMovieGet(c *gin.Context) {
 	c.JSON(http.StatusOK, utils.ResponseObject(movie))
 }
 
+func (handler *MovieHandler) ShowAllMovieGet(c *gin.Context) {
+	movies, _ := handler.Service.GetAll()
+	c.JSON(http.StatusOK, utils.ResponseObject(gin.H{
+		"message": "Data retrieval successfully",
+		"total":   len(movies),
+		"data":    movies,
+	}))
+}
+
 func (handler *MovieHandler) RemoveOneMovieDelete(c *gin.Context) {
 	id := c.Param("id")
 	err := handler.Service.DeleteID(id)
 	if err != nil {
-		c.JSON(http.StatusNotFound, utils.ResponseServerError("Something went wrong."))
+		c.JSON(http.StatusNotFound, utils.ResponseServerError("Not found!"))
 		return
 	}
 
