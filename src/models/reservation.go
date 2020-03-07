@@ -20,12 +20,13 @@ type ReservationRepository struct {
 }
 
 type Reservation struct {
-	MovieId     string    `form:"movieId" json:"movieId" binding:"required"`
-	SeatNo      []string  `form:"seatNo" json:"seatNo" binding:"required"`
-	UserId      string    `form:"userId" json:"userId" binding:"required"`
-	CreatedAt   time.Time `bson:"created_at"`
-	UpdatedAt   time.Time `bson:"updated_at"`
-	MovieDetail *Movie    `json:"movieDetail,omitempty"`
+	Id          primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+	MovieId     string             `form:"movieId" json:"movieId" binding:"required"`
+	SeatNo      []string           `form:"seatNo" json:"seatNo" binding:"required"`
+	UserId      string             `form:"userId" json:"userId" binding:"required"`
+	CreatedAt   time.Time          `bson:"created_at"`
+	UpdatedAt   time.Time          `bson:"updated_at"`
+	MovieDetail *Movie             `json:"movieDetail,omitempty"`
 }
 
 func (repo *ReservationRepository) GetID(id, userId string) (Reservation, error) {

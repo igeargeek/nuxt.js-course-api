@@ -21,13 +21,14 @@ type MovieRepository struct {
 }
 
 type Movie struct {
-	Name         string   `form:"name" json:"name" binding:"required"`
-	Genre        []string `form:"genre" json:"genre" binding:"required"`
-	PosterURL    string   `form:"posterUrl" json:"posterUrl" binding:"required"`
-	YoutubeURL   string   `form:"youtubeUrl" json:"youtubeUrl" binding:"required"`
-	Description  string   `form:"description" json:"description" binding:"required"`
-	Duration     int      `form:"duration" json:"duration" binding:"required"`
-	ReservedSeat []string `form:"reservedSeat" json:"reservedSeat"`
+	Id           primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+	Name         string             `form:"name" json:"name" binding:"required"`
+	Genre        []string           `form:"genre" json:"genre" binding:"required"`
+	PosterURL    string             `form:"posterUrl" json:"posterUrl" binding:"required"`
+	YoutubeURL   string             `form:"youtubeUrl" json:"youtubeUrl" binding:"required"`
+	Description  string             `form:"description" json:"description" binding:"required"`
+	Duration     int                `form:"duration" json:"duration" binding:"required"`
+	ReservedSeat []string           `form:"reservedSeat" json:"reservedSeat"`
 }
 
 func (repo *MovieRepository) GetID(id string) (Movie, error) {
