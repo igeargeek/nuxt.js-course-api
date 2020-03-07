@@ -11,14 +11,25 @@ import (
 )
 
 type UserHandler struct {
-	Service   models.UserRepository
+	Service   models.UserReporer
 	Validator ut.Translator
 }
 
-func NewUserHandler(repository models.UserRepository, validator ut.Translator) UserHandler {
+func NewUserHandler(repository models.UserReporer, validator ut.Translator) UserHandler {
 	return UserHandler{
 		Service:   repository,
 		Validator: validator,
+	}
+}
+
+func (handler *UserHandler) LoginUserPost(c *gin.Context) {
+	var credential struct {
+		Username string `form:"username" json:"username" binding:"required"`
+		Password string `form:"password" json:"password" binding:"required"`
+	}
+	if err := c.ShouldBind(&credential); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, utils.ResponseErrorValidation(handler.Validator, err))
+		return
 	}
 }
 
