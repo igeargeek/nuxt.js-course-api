@@ -14,7 +14,7 @@ type MovieReporer interface {
 }
 
 type MovieRepository struct {
-	DB *mongo.Client
+	DB *mongo.Collection
 }
 
 type Movie struct {
@@ -22,8 +22,7 @@ type Movie struct {
 }
 
 func (repo *MovieRepository) Create(movie *Movie) (primitive.ObjectID, error) {
-	collection := repo.DB.Database("movie_ticket").Collection("movies")
-	res, err := collection.InsertOne(context.TODO(), bson.M{
+	res, err := repo.DB.InsertOne(context.TODO(), bson.M{
 		"name": movie.Name,
 	})
 	if err != nil {

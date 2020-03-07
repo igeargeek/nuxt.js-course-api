@@ -28,9 +28,23 @@ func (handler *UserHandler) RegisterUserPost(c *gin.Context) {
 		c.JSON(http.StatusUnprocessableEntity, utils.ResponseErrorValidation(handler.Validator, err))
 		return
 	}
-	id, err := handler.Service.Create(&user)
+
+	hashPassword, err := utils.HashPassword(user.Password)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
+		return
+	}
+
+	user.Password = hashPassword
+
+	id, err := handler.Service.Create(&user)
+	if err != nil {
+		if err == utils.ErrRowExists {
+			c.JSON(http.StatusBadRequest, utils.ResponseMessage("Username is exists."))
+			return
+		}
+		c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
+		return
 	}
 
 	c.JSON(http.StatusCreated, utils.ResponseObject(gin.H{
