@@ -9,8 +9,9 @@ import (
 )
 
 type MovieReporer interface {
-	GetID(ID int) (int, error)
+	GetID(string) (Movie, error)
 	Create(movie *Movie) (primitive.ObjectID, error)
+	DeleteID(string) error
 }
 
 type MovieRepository struct {
@@ -18,17 +19,51 @@ type MovieRepository struct {
 }
 
 type Movie struct {
-	Name string `form:"name" json:"name" binding:"required"`
+	Name         string   `form:"name" json:"name" binding:"required"`
+	Genre        []string `form:"genre" json:"genre" binding:"required"`
+	PosterURL    string   `form:"posterUrl" json:"posterUrl" binding:"required"`
+	YoutubeURL   string   `form:"youtubeUrl" json:"youtubeUrl" binding:"required"`
+	Description  string   `form:"description" json:"description" binding:"required"`
+	Duration     int      `form:"duration" json:"duration" binding:"required"`
+	ReservedSeat []string `form:"reservedSeat" json:"reservedSeat"`
+}
+
+func (repo *MovieRepository) GetID(id string) (Movie, error) {
+	var movie Movie
+	collection := repo.DB.Database("movie_ticket").Collection("movies")
+	_id, _ := primitive.ObjectIDFromHex(id)
+	filter := bson.M{"_id": _id}
+	err := collection.FindOne(context.TODO(), filter).Decode(&movie)
+	if err != nil {
+		return movie, err
+	}
+	return movie, nil
 }
 
 func (repo *MovieRepository) Create(movie *Movie) (primitive.ObjectID, error) {
 	collection := repo.DB.Database("movie_ticket").Collection("movies")
 	res, err := collection.InsertOne(context.TODO(), bson.M{
-		"name": movie.Name,
+		"name":        movie.Name,
+		"genre":       movie.Genre,
+		"posterUrl":   movie.PosterURL,
+		"youtubeUrl":  movie.YoutubeURL,
+		"description": movie.Description,
+		"duration":    movie.Duration,
 	})
 	if err != nil {
 		return primitive.NilObjectID, err
 	}
 
 	return res.InsertedID.(primitive.ObjectID), nil
+}
+
+func (repo *MovieRepository) DeleteID(id string) error {
+	collection := repo.DB.Database("movie_ticket").Collection("movies")
+	_id, _ := primitive.ObjectIDFromHex(id)
+	filter := bson.M{"_id": _id}
+	_, err := collection.DeleteOne(context.TODO(), filter)
+	if err != nil {
+		return err
+	}
+	return nil
 }
