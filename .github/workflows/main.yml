@@ -11,14 +11,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-steps:
-  - uses: actions/checkout@v1.0
-
-  - uses: mr-smithers-excellent/docker-build-push@v2
-    with:
-      image: iamsvz/nuxt.js-course-api
-      tag: latest
-      registry: docker.io
-      dockerfile: Dockerfile.prod
-      username: ${{ secrets.DOCKER_USERNAME }}
-      password: ${{ secrets.DOCKER_PASSWORD }}
+      - uses: actions/checkout@v1.0
+      - uses: mr-smithers-excellent/docker-build-push@v2
+        with:
+          image: iamsvz/nuxt.js-course-api
+          tag: latest
+          registry: docker.io
+          dockerfile: Dockerfile.prod
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+  
