@@ -11,6 +11,8 @@ import (
 func UserRoute(router *gin.RouterGroup, userHandler controllers.UserHandler) {
 	router.POST("/register", userHandler.RegisterUserPost)
 	router.POST("/login", userHandler.LoginUserPost)
+	router.POST("/refresh-token", userHandler.RefreshTokenPost)
+	router.POST("/payload", userHandler.PayloadTokenPost)
 }
 
 func MovieRoute(router *gin.RouterGroup, movieHandler controllers.MovieHandler) {
