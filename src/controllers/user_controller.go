@@ -3,7 +3,6 @@ package controllers
 import (
 	"fmt"
 	"net/http"
-	"strings"
 
 	"app/src/constants"
 	"app/src/models"
@@ -219,14 +218,14 @@ func (handler *UserHandler) RefreshTokenPost(c *gin.Context) {
 		expirationTimeAccessToken))
 }
 
-func (handler *UserHandler) PayloadTokenPost(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	splitToken := strings.Split(token, "Bearer")
-	if len(splitToken) != 2 {
+func (handler *UserHandler) PayloadTokenGet(c *gin.Context) {
+	tokenHeader := c.Request.Header.Get("Authorization")
+
+	token, ok := utils.SplitTokenFromHeader(tokenHeader)
+	if !ok {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ResponseMessage("Unauthorized."))
 		return
 	}
-	token = strings.TrimSpace(splitToken[1])
 
 	payload, err := handler.Service.GetAccessToken(token)
 	if err != nil {
