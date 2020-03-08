@@ -94,3 +94,17 @@ func SetAccessTokenAndRefreshToken(id primitive.ObjectID, name, username string,
 
 	return accessToken, refreshToken, expirationTimeAccessToken, nil
 }
+
+func GetUserPayload(token string) (*Claims, *jwt.Token, error) {
+	claims := &Claims{}
+
+	parseToken, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		return AccessKey, nil
+	})
+
+	if err != nil || !parseToken.Valid {
+		return nil, parseToken, err
+	}
+
+	return claims, parseToken, nil
+}

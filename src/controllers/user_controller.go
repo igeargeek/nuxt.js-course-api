@@ -1,9 +1,11 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
+	"app/src/constants"
 	"app/src/models"
 	"app/src/utils"
 
@@ -107,7 +109,7 @@ func (handler *UserHandler) RegisterUserPost(c *gin.Context) {
 
 	id, err := handler.Service.Create(&user)
 	if err != nil {
-		if err.Error() == utils.ErrRowExists.Error() {
+		if err.Error() == constants.ErrRowExists.Error() {
 			c.JSON(http.StatusBadRequest, utils.ResponseMessage("Username is exists."))
 			return
 		} else {
@@ -130,7 +132,7 @@ func (handler *UserHandler) RefreshTokenPost(c *gin.Context) {
 		return
 	}
 
-	token, err := handler.Service.GetRefreshToken(oldRefreshToken)
+	payload, err := handler.Service.GetRefreshToken(oldRefreshToken)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ResponseMessage("Unauthorized."))
@@ -142,11 +144,12 @@ func (handler *UserHandler) RefreshTokenPost(c *gin.Context) {
 
 	claims := &utils.Claims{}
 
-	parseToken, err := jwt.ParseWithClaims(token.Token, claims, func(token *jwt.Token) (interface{}, error) {
+	parseToken, err := jwt.ParseWithClaims(payload.Token, claims, func(token *jwt.Token) (interface{}, error) {
 		return utils.RefreshKey, nil
 	})
 
 	if err != nil {
+		fmt.Println("in err", err)
 		if err == jwt.ErrSignatureInvalid {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ResponseMessage("Unauthorized."))
 			return
@@ -156,6 +159,7 @@ func (handler *UserHandler) RefreshTokenPost(c *gin.Context) {
 	}
 
 	if !parseToken.Valid {
+		fmt.Println("in parse", err)
 		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ResponseMessage("Unauthorized."))
 		return
 	}
@@ -203,7 +207,7 @@ func (handler *UserHandler) RefreshTokenPost(c *gin.Context) {
 		return
 	}
 
-	err = handler.Service.RemoveRefreshToken(token.ID)
+	err = handler.Service.RemoveRefreshToken(payload.ID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
 		return
@@ -224,7 +228,7 @@ func (handler *UserHandler) PayloadTokenPost(c *gin.Context) {
 	}
 	token = strings.TrimSpace(splitToken[1])
 
-	accessToken, err := handler.Service.GetAccessToken(token)
+	payload, err := handler.Service.GetAccessToken(token)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ResponseMessage("Unauthorized."))
@@ -234,11 +238,7 @@ func (handler *UserHandler) PayloadTokenPost(c *gin.Context) {
 		return
 	}
 
-	claims := &utils.Claims{}
-
-	parseToken, err := jwt.ParseWithClaims(accessToken.Token, claims, func(token *jwt.Token) (interface{}, error) {
-		return utils.AccessKey, nil
-	})
+	claims, parseToken, err := utils.GetUserPayload(payload.Token)
 
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
