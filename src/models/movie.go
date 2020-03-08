@@ -29,6 +29,7 @@ type Movie struct {
 	Description  string             `form:"description" json:"description" binding:"required"`
 	Duration     int                `form:"duration" json:"duration" binding:"required"`
 	ReservedSeat []string           `form:"reservedSeat" json:"reservedSeat"`
+	ShowingAt    string             `form:"showingAt" json:"showingAt" binding:"required"`
 }
 
 func (repo *MovieRepository) GetID(id string) (Movie, error) {
@@ -69,6 +70,7 @@ func (repo *MovieRepository) Create(movie *Movie) (primitive.ObjectID, error) {
 		"youtubeUrl":  movie.YoutubeURL,
 		"description": movie.Description,
 		"duration":    movie.Duration,
+		"showingAt":   movie.ShowingAt,
 	})
 	if err != nil {
 		return primitive.NilObjectID, err
@@ -89,6 +91,7 @@ func (repo *MovieRepository) Edit(id string, movie *Movie) error {
 			"description":  movie.Description,
 			"duration":     movie.Duration,
 			"reservedSeat": movie.ReservedSeat,
+			"showingAt":    movie.ShowingAt,
 		},
 	})
 	if err != nil {
