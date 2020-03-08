@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"app/src/utils"
+	"app/src/constants"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -74,7 +74,7 @@ func (repo *UserRepository) Create(user *User) (primitive.ObjectID, error) {
 			return primitive.NilObjectID, err
 		}
 	} else {
-		return primitive.NilObjectID, utils.ErrRowExists
+		return primitive.NilObjectID, constants.ErrRowExists
 	}
 
 	timeNow := time.Now()
