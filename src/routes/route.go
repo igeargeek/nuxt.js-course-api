@@ -16,15 +16,15 @@ func UserRoute(router *gin.RouterGroup, userHandler controllers.UserHandler) {
 }
 
 func MovieRoute(router *gin.RouterGroup, movieHandler controllers.MovieHandler, reservationHandler controllers.ReservationHandler) {
-	router.POST("/", movieHandler.CreateMoviePost)
+	router.POST("", movieHandler.CreateMoviePost)
 	router.GET("/:id", movieHandler.ShowOneMovieGet)
 	router.DELETE("/:id", movieHandler.RemoveOneMovieDelete)
 	router.PUT("/:id", movieHandler.EditMoviePut)
-	router.GET("/", movieHandler.ShowAllMovieGet)
+	router.GET("", movieHandler.ShowAllMovieGet)
 	router.POST("/:id/_reseve", reservationHandler.CreateReservationPost)
 }
 
 func ReservationRoute(router *gin.RouterGroup, reservationHandler controllers.ReservationHandler) {
 	router.GET("/:id", reservationHandler.ShowOneReservationGet)
-	router.GET("/", reservationHandler.ShowAllReservationGet)
+	router.GET("", reservationHandler.ShowAllReservationGet)
 }
