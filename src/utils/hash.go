@@ -96,6 +96,33 @@ func SetAccessTokenAndRefreshToken(id primitive.ObjectID, name, username string,
 }
 
 func GetUserPayload(token string) (*Claims, *jwt.Token, error) {
+	// example use
+	// token, ok := utils.SplitTokenFromHeader(tokenHeader)
+	// if !ok {
+	// 	c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ResponseMessage("Unauthorized."))
+	// 	return
+	// }
+
+	// claims, parseToken, err := utils.GetUserPayload(token)
+	// เช็คว่า token ที่ส่งมาถูกต้องหรือป่าว parse token และเช็ค
+	// if err != nil {
+	// 	if err == jwt.ErrSignatureInvalid {
+	// 		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ResponseMessage("Unauthorized."))
+	// 		return
+	// 	}
+	// 	c.AbortWithStatusJSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
+	// 	return
+	// }
+
+	// end of handler error
+	// เช็คว่า token ทั้งหมด header payload signature ถูกทั้งหมดหรือป่าว
+	// if !parseToken.Valid {
+	// 	c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ResponseMessage("Unauthorized."))
+	// 	return
+	// }
+	// claims contain
+	// end of example use
+
 	claims := &Claims{}
 
 	parseToken, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {

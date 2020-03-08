@@ -5,7 +5,6 @@ import (
 	"app/src/utils"
 
 	"net/http"
-	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -14,13 +13,13 @@ import (
 
 func AuthMiddleware(model models.UserReporer) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		token := c.Request.Header.Get("Authorization")
-		splitToken := strings.Split(token, "Bearer")
-		if len(splitToken) != 2 {
+		tokenHeader := c.Request.Header.Get("Authorization")
+
+		accessToken, ok := utils.SplitTokenFromHeader(tokenHeader)
+		if !ok {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ResponseMessage("Unauthorized."))
 			return
 		}
-		accessToken := strings.TrimSpace(splitToken[1])
 
 		payload, err := model.GetAccessToken(accessToken)
 		if err != nil {
