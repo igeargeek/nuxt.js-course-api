@@ -8,6 +8,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	ut "github.com/go-playground/universal-translator"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type ReservationHandler struct {
@@ -26,7 +28,7 @@ func NewReservationHandler(movieRepository models.MovieReporer, reservationRepos
 
 func (handler *ReservationHandler) ShowOneReservationGet(c *gin.Context) {
 	id := c.Param("id")
-	userId := "123" // mock user id
+	userId := c.MustGet("userId").(primitive.ObjectID)
 	reservation, err := handler.ReservationService.GetID(id, userId)
 	if err != nil {
 		c.JSON(http.StatusNotFound, utils.ResponseServerError("Not found!"))
@@ -43,7 +45,7 @@ func (handler *ReservationHandler) ShowOneReservationGet(c *gin.Context) {
 }
 
 func (handler *ReservationHandler) ShowAllReservationGet(c *gin.Context) {
-	userId := "123" // mock user id
+	userId := c.MustGet("userId").(primitive.ObjectID)
 	reservations, _ := handler.ReservationService.GetAll(userId)
 	c.JSON(http.StatusOK, utils.ResponseObject(gin.H{
 		"message": "Data retrieval successfully",
@@ -55,7 +57,7 @@ func (handler *ReservationHandler) ShowAllReservationGet(c *gin.Context) {
 func (handler *ReservationHandler) CreateReservationPost(c *gin.Context) {
 	var reservation models.Reservation
 	reservation.MovieId = c.Param("id")
-	reservation.UserId = "123" // mock user id
+	reservation.UserId = c.MustGet("userId").(primitive.ObjectID)
 	if err := c.ShouldBind(&reservation); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, utils.ResponseErrorValidation(handler.Validator, err))
 		return

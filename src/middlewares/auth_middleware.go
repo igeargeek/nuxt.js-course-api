@@ -31,9 +31,8 @@ func AuthMiddleware(model models.UserReporer) gin.HandlerFunc {
 			return
 		}
 
-		parseToken, err := jwt.Parse(payload.Token, func(token *jwt.Token) (interface{}, error) {
-			return utils.AccessKey, nil
-		})
+		claims := &utils.Claims{}
+		claims, parseToken, err := utils.GetUserPayload(payload.Token)
 
 		if ve, ok := err.(*jwt.ValidationError); ok {
 			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
@@ -44,12 +43,18 @@ func AuthMiddleware(model models.UserReporer) gin.HandlerFunc {
 				return
 			} else {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
-			return
+				return
 			}
 		} else if !parseToken.Valid {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
 			return
 		}
+
+		c.Set("userId", claims.ID)
+		c.Set("Name", claims.Name)
+		c.Set("Username", claims.Username)
+		c.Set("CreatedAt", claims.CreatedAt)
+		c.Set("UpdatedAt", claims.UpdatedAt)
 
 		c.Next()
 	}

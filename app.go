@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"app/src/controllers"
-	"app/src/middlewares"
 	"app/src/routes"
 
 	"github.com/gin-gonic/gin"
@@ -66,10 +65,10 @@ func main() {
 	routes.UserRoute(userRoute, app.UserHandler)
 
 	movieRoute := router.Group("/movies")
-	routes.MovieRoute(movieRoute, app.MovieHandler, app.ReservationHandler)
+	routes.MovieRoute(movieRoute, app.UserHandler, app.MovieHandler, app.ReservationHandler)
 
-	reservationRoute := router.Group("/reservations", middlewares.AuthMiddleware(app.UserHandler.Service))
-	routes.ReservationRoute(reservationRoute, app.ReservationHandler)
+	reservationRoute := router.Group("/reservations")
+	routes.ReservationRoute(reservationRoute, app.UserHandler, app.ReservationHandler)
 
 	portListen := "8000"
 	if port := os.Getenv("PORT"); port != "" {
