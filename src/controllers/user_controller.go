@@ -124,7 +124,7 @@ func (handler *UserHandler) RegisterUserPost(c *gin.Context) {
 }
 
 func (handler *UserHandler) RefreshTokenPost(c *gin.Context) {
-	oldRefreshToken := c.GetHeader("refresh_token")
+	oldRefreshToken := c.PostForm("refresh_token")
 
 	if oldRefreshToken == "" {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ResponseMessage("Unauthorized."))
