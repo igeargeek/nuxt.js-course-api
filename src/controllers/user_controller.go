@@ -219,46 +219,12 @@ func (handler *UserHandler) RefreshTokenPost(c *gin.Context) {
 }
 
 func (handler *UserHandler) PayloadTokenGet(c *gin.Context) {
-	tokenHeader := c.Request.Header.Get("Authorization")
-
-	token, ok := utils.SplitTokenFromHeader(tokenHeader)
-	if !ok {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ResponseMessage("Unauthorized."))
-		return
-	}
-
-	payload, err := handler.Service.GetAccessToken(token)
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ResponseMessage("Unauthorized."))
-			return
-		}
-		c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
-		return
-	}
-
-	claims, parseToken, err := utils.GetUserPayload(payload.Token)
-
-	if err != nil {
-		if err == jwt.ErrSignatureInvalid {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ResponseMessage("Unauthorized."))
-			return
-		}
-		c.AbortWithStatusJSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
-		return
-	}
-
-	if !parseToken.Valid {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ResponseMessage("Unauthorized."))
-		return
-	}
-
 	c.JSON(http.StatusOK, utils.ResponseObject(gin.H{
-		"id":         claims.ID,
-		"name":       claims.Name,
-		"username":   claims.Username,
-		"created_at": claims.CreatedAt,
-		"updated_at": claims.UpdatedAt,
+		"id":         c.MustGet("userId"),
+		"name":       c.MustGet("Name"),
+		"username":   c.MustGet("Username"),
+		"created_at": c.MustGet("CreatedAt"),
+		"updated_at": c.MustGet("UpdatedAt"),
 		"deleted_at": nil,
 	}))
 }

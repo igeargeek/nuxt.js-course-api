@@ -10,9 +10,9 @@ import (
 )
 
 type ReservationReporer interface {
-	GetID(string, string) (Reservation, error)
+	GetID(string, primitive.ObjectID) (Reservation, error)
 	Create(*Reservation, *Movie) (primitive.ObjectID, error)
-	GetAll(string) ([]*Reservation, error)
+	GetAll(primitive.ObjectID) ([]*Reservation, error)
 }
 
 type ReservationRepository struct {
@@ -23,13 +23,13 @@ type Reservation struct {
 	Id          primitive.ObjectID `json:"id" bson:"_id,omitempty"`
 	MovieId     string             `form:"movieId" json:"movieId" binding:"required"`
 	SeatNo      []string           `form:"seatNo" json:"seatNo" binding:"required"`
-	UserId      string             `form:"userId" json:"userId" binding:"required"`
+	UserId      primitive.ObjectID `form:"userId" json:"userId" binding:"required"`
 	CreatedAt   time.Time          `bson:"created_at"`
 	UpdatedAt   time.Time          `bson:"updated_at"`
 	MovieDetail *Movie             `json:"movieDetail,omitempty"`
 }
 
-func (repo *ReservationRepository) GetID(id, userId string) (Reservation, error) {
+func (repo *ReservationRepository) GetID(id string, userId primitive.ObjectID) (Reservation, error) {
 	var reservation Reservation
 	_id, _ := primitive.ObjectIDFromHex(id)
 	filter := bson.M{"_id": _id, "userId": userId}
@@ -40,7 +40,7 @@ func (repo *ReservationRepository) GetID(id, userId string) (Reservation, error)
 	return reservation, nil
 }
 
-func (repo *ReservationRepository) GetAll(userId string) ([]*Reservation, error) {
+func (repo *ReservationRepository) GetAll(userId primitive.ObjectID) ([]*Reservation, error) {
 	cur, err := repo.DB.Find(context.TODO(), bson.M{
 		"userId": userId,
 	})
