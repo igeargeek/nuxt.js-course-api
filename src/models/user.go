@@ -17,6 +17,7 @@ type UserReporer interface {
 	Create(user *User) (primitive.ObjectID, error)
 	CreateRefreshToken(token *RefreshToken) error
 	FindByUsername(username string) (User, error)
+	CheckUserNameExists(username string) (primitive.ObjectID, error)
 	GetAccessToken(token string) (AccessToken, error)
 	GetRefreshToken(token string) (RefreshToken, error)
 	RemoveRefreshToken(ID primitive.ObjectID) error
@@ -69,16 +70,18 @@ func (repo *UserRepository) FindByUsername(username string) (User, error) {
 	return user, err
 }
 
-func (repo *UserRepository) Create(user *User) (primitive.ObjectID, error) {
-	_, err := repo.FindByUsername(user.Username)
+func (repo *UserRepository) CheckUserNameExists(username string) (primitive.ObjectID, error) {
+	_, err := repo.FindByUsername(username)
 	if err != nil {
 		if err != mongo.ErrNoDocuments {
 			return primitive.NilObjectID, err
 		}
-	} else {
-		return primitive.NilObjectID, constants.ErrRowExists
+		return primitive.NilObjectID, nil
 	}
+	return primitive.NilObjectID, constants.ErrRowExists
+}
 
+func (repo *UserRepository) Create(user *User) (primitive.ObjectID, error) {
 	timeNow := time.Now()
 
 	res, err := repo.DB.InsertOne(context.TODO(), bson.M{

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"app/src/constants"
 	"app/src/models"
@@ -93,21 +94,13 @@ func (handler *UserHandler) RegisterUserPost(c *gin.Context) {
 		return
 	}
 
-	file := user.AvatarFile
-	avatar := ""
-	if file != nil {
-		dst := filepath.Base(file.Filename)
-		extension := filepath.Ext(dst)
-		avatar = utils.GetTimeNowFormatYYYYMMDDHHIIMM() + extension
-		if valid := utils.CheckInArrayString([]string{
-			".jpeg", ".jpg", ".png",
-		}, extension); !valid {
-			c.JSON(http.StatusUnprocessableEntity, utils.ResponseMessage("Upload image accept jpeg, jpg, png extension only."))
+	_, err := handler.Service.CheckUserNameExists(user.Username)
+	if err != nil {
+		if err.Error() == constants.ErrRowExists.Error() {
+			c.JSON(http.StatusBadRequest, utils.ResponseMessage("Username is exists."))
 			return
-		}
-
-		if err := c.SaveUploadedFile(file, "/src/public/"+avatar); err != nil {
-			c.String(http.StatusBadRequest, fmt.Sprintf("upload file err: %s", err.Error()))
+		} else {
+			c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
 			return
 		}
 	}
@@ -118,18 +111,38 @@ func (handler *UserHandler) RegisterUserPost(c *gin.Context) {
 		return
 	}
 
+	file := user.AvatarFile
+	avatar := ""
+	if file != nil {
+		dst := filepath.Base(file.Filename)
+		extension := filepath.Ext(dst)
+		avatar = utils.GetTimeNowFormatYYYYMMDDHHIIMM() + extension
+		baseDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
+			return
+		}
+
+		if valid := utils.CheckInArrayString([]string{
+			".jpeg", ".jpg", ".png",
+		}, extension); !valid {
+			c.JSON(http.StatusUnprocessableEntity, utils.ResponseMessage("Upload image accept jpeg, jpg, png extension only."))
+			return
+		}
+
+		if err := c.SaveUploadedFile(file, baseDir+"/src/public/"+avatar); err != nil {
+			c.String(http.StatusBadRequest, fmt.Sprintf("upload file err: %s", err.Error()))
+			return
+		}
+	}
+
 	user.Password = hashPassword
 	user.Avatar = avatar
 
 	id, err := handler.Service.Create(&user)
 	if err != nil {
-		if err.Error() == constants.ErrRowExists.Error() {
-			c.JSON(http.StatusBadRequest, utils.ResponseMessage("Username is exists."))
-			return
-		} else {
-			c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
-			return
-		}
+		c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
+		return
 	}
 
 	c.JSON(http.StatusCreated, utils.ResponseObject(gin.H{
