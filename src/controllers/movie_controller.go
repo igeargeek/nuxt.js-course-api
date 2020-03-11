@@ -36,7 +36,7 @@ func (handler *MovieHandler) ShowOneMovieGet(c *gin.Context) {
 func (handler *MovieHandler) ShowAllMovieGet(c *gin.Context) {
 	movies, _ := handler.Service.GetAll()
 	c.JSON(http.StatusOK, utils.ResponseObject(gin.H{
-		"message": "Data retrieval successfully",
+		"message": "Movie data retrieval successfully",
 		"total":   len(movies),
 		"data":    movies,
 	}))
