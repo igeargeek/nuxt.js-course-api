@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"mime/multipart"
 	"time"
 
 	"app/src/constants"
@@ -14,7 +15,6 @@ import (
 type UserReporer interface {
 	GetID(ID primitive.ObjectID) (User, error)
 	Create(user *User) (primitive.ObjectID, error)
-	CreateAccessToken(token *AccessToken) error
 	CreateRefreshToken(token *RefreshToken) error
 	FindByUsername(username string) (User, error)
 	GetAccessToken(token string) (AccessToken, error)
@@ -41,12 +41,14 @@ type RefreshToken struct {
 }
 
 type User struct {
-	ID        primitive.ObjectID `bson:"_id",omitempty`
-	Name      string             `bson:"name" form:"name" json:"name" binding:"required"`
-	Username  string             `bson:"username" form:"username" json:"username" binding:"required"`
-	Password  string             `bson:"password" form:"password" json:"password" binding:"required"`
-	CreatedAt time.Time          `bson:"createdAt" json:"createdAt"`
-	UpdatedAt time.Time          `bson:"updatedAt" json:"updatedAt"`
+	ID         primitive.ObjectID    `bson:"_id",omitempty`
+	Name       string                `bson:"name" form:"name" json:"name" binding:"required"`
+	Username   string                `bson:"username" form:"username" json:"username" binding:"required"`
+	Password   string                `bson:"password" form:"password" json:"password" binding:"required"`
+	AvatarFile *multipart.FileHeader `form:"avatar"`
+	Avatar     string                `bson:"avatar" json:"avatar"`
+	CreatedAt  time.Time             `bson:"createdAt" json:"createdAt"`
+	UpdatedAt  time.Time             `bson:"updatedAt" json:"updatedAt"`
 }
 
 func (repo *UserRepository) GetID(ID primitive.ObjectID) (User, error) {
@@ -83,6 +85,7 @@ func (repo *UserRepository) Create(user *User) (primitive.ObjectID, error) {
 		"name":      user.Name,
 		"username":  user.Username,
 		"password":  user.Password,
+		"avatar":    "public/" + user.Avatar,
 		"createdAt": timeNow,
 		"updatedAt": timeNow,
 	})
@@ -91,18 +94,6 @@ func (repo *UserRepository) Create(user *User) (primitive.ObjectID, error) {
 	}
 
 	return res.InsertedID.(primitive.ObjectID), nil
-}
-
-func (repo *UserRepository) CreateAccessToken(token *AccessToken) error {
-	_, err := repo.DBAccessToken.InsertOne(context.TODO(), bson.M{
-		"userId":      token.UserID,
-		"accessToken": token.Token,
-	})
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func (repo *UserRepository) CreateRefreshToken(token *RefreshToken) error {
