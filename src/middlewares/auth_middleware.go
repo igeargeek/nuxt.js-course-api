@@ -8,7 +8,6 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func AuthMiddleware(model models.UserReporer) gin.HandlerFunc {
@@ -21,18 +20,8 @@ func AuthMiddleware(model models.UserReporer) gin.HandlerFunc {
 			return
 		}
 
-		payload, err := model.GetAccessToken(accessToken)
-		if err != nil {
-			if err == mongo.ErrNoDocuments {
-				c.AbortWithStatusJSON(http.StatusUnauthorized, utils.ResponseMessage("Unauthorized."))
-				return
-			}
-			c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
-			return
-		}
-
 		claims := &utils.Claims{}
-		claims, parseToken, err := utils.GetUserPayload(payload.Token)
+		claims, parseToken, err := utils.GetUserPayload(accessToken)
 
 		if ve, ok := err.(*jwt.ValidationError); ok {
 			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
@@ -53,6 +42,7 @@ func AuthMiddleware(model models.UserReporer) gin.HandlerFunc {
 		c.Set("userId", claims.ID)
 		c.Set("Name", claims.Name)
 		c.Set("Username", claims.Username)
+		c.Set("Avatar", claims.Avatar)
 		c.Set("CreatedAt", claims.CreatedAt)
 		c.Set("UpdatedAt", claims.UpdatedAt)
 

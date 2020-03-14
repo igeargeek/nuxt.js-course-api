@@ -2,11 +2,15 @@ package controllers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 
 	"app/src/constants"
 	"app/src/models"
 	"app/src/utils"
+
+	"path/filepath"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -28,8 +32,8 @@ func NewUserHandler(repository models.UserReporer, validator ut.Translator) User
 
 func (handler *UserHandler) LoginUserPost(c *gin.Context) {
 	var credential struct {
-		Username string `form:"username" json:"username" binding:"required"`
-		Password string `form:"password" json:"password" binding:"required"`
+		Username string `json:"username" binding:"required"`
+		Password string `json:"password" binding:"required"`
 	}
 	if err := c.ShouldBind(&credential); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, utils.ResponseErrorValidation(handler.Validator, err))
@@ -56,20 +60,11 @@ func (handler *UserHandler) LoginUserPost(c *gin.Context) {
 		user.ID,
 		user.Name,
 		user.Username,
+		user.Avatar,
 		user.CreatedAt,
 		user.UpdatedAt,
 	)
 
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
-		return
-	}
-
-	mAccessToken := &models.AccessToken{
-		UserID: user.ID,
-		Token:  accessToken,
-	}
-	err = handler.Service.CreateAccessToken(mAccessToken)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
 		return
@@ -94,19 +89,12 @@ func (handler *UserHandler) LoginUserPost(c *gin.Context) {
 func (handler *UserHandler) RegisterUserPost(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBind(&user); err != nil {
+		log.Fatal(err)
 		c.JSON(http.StatusUnprocessableEntity, utils.ResponseErrorValidation(handler.Validator, err))
 		return
 	}
 
-	hashPassword, err := utils.HashPassword(user.Password)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
-		return
-	}
-
-	user.Password = hashPassword
-
-	id, err := handler.Service.Create(&user)
+	_, err := handler.Service.CheckUserNameExists(user.Username)
 	if err != nil {
 		if err.Error() == constants.ErrRowExists.Error() {
 			c.JSON(http.StatusBadRequest, utils.ResponseMessage("Username is exists."))
@@ -115,6 +103,46 @@ func (handler *UserHandler) RegisterUserPost(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
 			return
 		}
+	}
+
+	hashPassword, err := utils.HashPassword(user.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
+		return
+	}
+
+	file := user.AvatarFile
+	avatar := ""
+	if file != nil {
+		dst := filepath.Base(file.Filename)
+		extension := filepath.Ext(dst)
+		avatar = utils.GetTimeNowFormatYYYYMMDDHHIIMM() + extension
+		baseDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
+			return
+		}
+
+		if valid := utils.CheckInArrayString([]string{
+			".jpeg", ".jpg", ".png",
+		}, extension); !valid {
+			c.JSON(http.StatusUnprocessableEntity, utils.ResponseMessage("Upload image accept jpeg, jpg, png extension only."))
+			return
+		}
+
+		if err := c.SaveUploadedFile(file, baseDir+"/src/public/"+avatar); err != nil {
+			c.String(http.StatusBadRequest, fmt.Sprintf("upload file err: %s", err.Error()))
+			return
+		}
+	}
+
+	user.Password = hashPassword
+	user.Avatar = avatar
+
+	id, err := handler.Service.Create(&user)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
+		return
 	}
 
 	c.JSON(http.StatusCreated, utils.ResponseObject(gin.H{
@@ -177,20 +205,11 @@ func (handler *UserHandler) RefreshTokenPost(c *gin.Context) {
 		user.ID,
 		user.Name,
 		user.Username,
+		user.Avatar,
 		user.CreatedAt,
 		user.UpdatedAt,
 	)
 
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
-		return
-	}
-
-	mAccessToken := &models.AccessToken{
-		UserID: user.ID,
-		Token:  accessToken,
-	}
-	err = handler.Service.CreateAccessToken(mAccessToken)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, utils.ResponseServerError("Something went wrong."))
 		return
@@ -223,6 +242,7 @@ func (handler *UserHandler) PayloadTokenGet(c *gin.Context) {
 		"id":         c.MustGet("userId"),
 		"name":       c.MustGet("Name"),
 		"username":   c.MustGet("Username"),
+		"avatar":     c.MustGet("Avatar"),
 		"created_at": c.MustGet("CreatedAt"),
 		"updated_at": c.MustGet("UpdatedAt"),
 		"deleted_at": nil,

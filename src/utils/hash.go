@@ -19,6 +19,7 @@ type Claims struct {
 	ID        primitive.ObjectID `json:"id"`
 	Name      string             `json:"name"`
 	Username  string             `json:"username"`
+	Avatar    string             `json:"avatar"`
 	CreatedAt time.Time          `json:"created_at"`
 	UpdatedAt time.Time          `json:"updated_at"`
 	jwt.StandardClaims
@@ -60,7 +61,7 @@ func GenerateRefreshToken(claim *RefreshTokenClaims) (string, error) {
 	return tokenString, nil
 }
 
-func SetAccessTokenAndRefreshToken(id primitive.ObjectID, name, username string, createdAt, updatedAt time.Time) (string, string, time.Time, error) {
+func SetAccessTokenAndRefreshToken(id primitive.ObjectID, name, username, avatar string, createdAt, updatedAt time.Time) (string, string, time.Time, error) {
 	expirationTimeAccessToken := time.Now().Add(time.Minute * time.Duration(AccessTokenMinute))
 	expirationTimeRefreshToken := time.Now().Add(time.Minute * time.Duration(RefreshTokenMinute))
 
@@ -68,6 +69,7 @@ func SetAccessTokenAndRefreshToken(id primitive.ObjectID, name, username string,
 		ID:        id,
 		Name:      name,
 		Username:  username,
+		Avatar:    avatar,
 		CreatedAt: createdAt,
 		UpdatedAt: updatedAt,
 		StandardClaims: jwt.StandardClaims{

@@ -60,6 +60,7 @@ func main() {
 
 	router := gin.Default()
 	router.Use(CORS)
+	router.Static("/public", "./src/public")
 
 	userRoute := router.Group("/users")
 	routes.UserRoute(userRoute, app.UserHandler)
