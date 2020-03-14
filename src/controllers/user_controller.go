@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
@@ -89,7 +88,6 @@ func (handler *UserHandler) LoginUserPost(c *gin.Context) {
 func (handler *UserHandler) RegisterUserPost(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBind(&user); err != nil {
-		log.Fatal(err)
 		c.JSON(http.StatusUnprocessableEntity, utils.ResponseErrorValidation(handler.Validator, err))
 		return
 	}
