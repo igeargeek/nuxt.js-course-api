@@ -14,6 +14,7 @@ FROM alpine
 RUN apk --no-cache add tzdata
 ENV TZ Asia/Bangkok
 WORKDIR /app
+RUN mkdir -p /app/src/public
 COPY --from=build /usr/local/go/src/app/main .
 ENTRYPOINT ./main
 
