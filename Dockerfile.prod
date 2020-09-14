@@ -10,7 +10,7 @@ COPY . .
 RUN wire
 RUN go build -o main
 
-FROM alpine
+FROM alpine:3.5
 RUN apk --no-cache add tzdata
 ENV TZ Asia/Bangkok
 WORKDIR /app
