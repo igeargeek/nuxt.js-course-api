@@ -1,5 +1,5 @@
 FROM golang:alpine AS build
-RUN apk --no-cache git bzr mercurial gcc
+RUN apk add --no-cache git bzr mercurial gcc
 ENV GO111MODULE=on
 WORKDIR /usr/local/go/src/app
 RUN go get github.com/google/wire/cmd/wire
@@ -11,7 +11,7 @@ RUN wire
 RUN go build -o main
 
 FROM alpine
-RUN apk --no-cache tzdata
+RUN apk add --no-cache tzdata
 ENV TZ Asia/Bangkok
 WORKDIR /app
 RUN mkdir -p /app/src/public
