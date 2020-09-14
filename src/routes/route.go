@@ -13,9 +13,10 @@ func UserRoute(router *gin.RouterGroup, userHandler controllers.UserHandler) {
 	router.POST("/register", userHandler.RegisterUserPost)
 	router.POST("/login", userHandler.LoginUserPost)
 	router.POST("/refresh-token", userHandler.RefreshTokenPost)
+	router.GET("/payload", middlewares.AuthMiddleware(userHandler.Service), userHandler.PayloadTokenGet)
+	router.GET("/profile/:id", userHandler.ShowOneUserGet)
 	router.GET("/", userHandler.ShowAllUserGet)
 	router.DELETE("/", userHandler.DeleteAllDelete)
-	router.GET("/payload", middlewares.AuthMiddleware(userHandler.Service), userHandler.PayloadTokenGet)
 }
 
 func MovieRoute(router *gin.RouterGroup, userHandler controllers.UserHandler, movieHandler controllers.MovieHandler, reservationHandler controllers.ReservationHandler) {

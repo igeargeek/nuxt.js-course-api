@@ -15,6 +15,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	ut "github.com/go-playground/universal-translator"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -273,4 +274,15 @@ func (handler *UserHandler) DeleteAllDelete(c *gin.Context) {
 	c.JSON(http.StatusOK, utils.ResponseObject(gin.H{
 		"message": "User data remove successfully",
 	}))
+}
+
+func (handler *UserHandler) ShowOneUserGet(c *gin.Context) {
+	_id, _ := primitive.ObjectIDFromHex(c.Param("id"))
+	user, err := handler.Service.GetID(_id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, utils.ResponseServerError("Not found!"))
+		return
+	}
+
+	c.JSON(http.StatusOK, utils.ResponseObject(user))
 }

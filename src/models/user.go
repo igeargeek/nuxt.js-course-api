@@ -63,7 +63,7 @@ func (repo *UserRepository) GetID(ID primitive.ObjectID) (User, error) {
 	if err == nil {
 		return user, nil
 	}
-	return user, nil
+	return user, err
 }
 
 func (repo *UserRepository) FindByUsername(username string) (User, error) {
