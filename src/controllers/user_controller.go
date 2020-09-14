@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"crypto/rand"
 	"fmt"
 	"log"
 	"net/http"
@@ -92,6 +93,17 @@ func (handler *UserHandler) RegisterUserPost(c *gin.Context) {
 		log.Fatal(err)
 		c.JSON(http.StatusUnprocessableEntity, utils.ResponseErrorValidation(handler.Validator, err))
 		return
+	}
+
+	if user.Username == "" && user.Password == "" {
+		n := 10
+		b := make([]byte, n)
+		if _, err := rand.Read(b); err != nil {
+			panic(err)
+		}
+		randS := fmt.Sprintf("%X", b)
+		user.Username = randS
+		user.Password = randS
 	}
 
 	_, err := handler.Service.CheckUserNameExists(user.Username)
@@ -246,5 +258,21 @@ func (handler *UserHandler) PayloadTokenGet(c *gin.Context) {
 		"created_at": c.MustGet("CreatedAt"),
 		"updated_at": c.MustGet("UpdatedAt"),
 		"deleted_at": nil,
+	}))
+}
+
+func (handler *UserHandler) ShowAllUserGet(c *gin.Context) {
+	users, _ := handler.Service.GetAll()
+	c.JSON(http.StatusOK, utils.ResponseObject(gin.H{
+		"message": "User data retrieval successfully",
+		"total":   len(users),
+		"data":    users,
+	}))
+}
+
+func (handler *UserHandler) DeleteAllDelete(c *gin.Context) {
+	handler.Service.Delete()
+	c.JSON(http.StatusOK, utils.ResponseObject(gin.H{
+		"message": "User data remove successfully",
 	}))
 }

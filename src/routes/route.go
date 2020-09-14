@@ -13,6 +13,8 @@ func UserRoute(router *gin.RouterGroup, userHandler controllers.UserHandler) {
 	router.POST("/register", userHandler.RegisterUserPost)
 	router.POST("/login", userHandler.LoginUserPost)
 	router.POST("/refresh-token", userHandler.RefreshTokenPost)
+	router.GET("/", userHandler.ShowAllUserGet)
+	router.DELETE("/", userHandler.DeleteAllDelete)
 	router.GET("/payload", middlewares.AuthMiddleware(userHandler.Service), userHandler.PayloadTokenGet)
 }
 

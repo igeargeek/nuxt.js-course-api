@@ -21,6 +21,8 @@ type UserReporer interface {
 	GetAccessToken(token string) (AccessToken, error)
 	GetRefreshToken(token string) (RefreshToken, error)
 	RemoveRefreshToken(ID primitive.ObjectID) error
+	GetAll() ([]*User, error)
+	Delete() error
 }
 
 type UserRepository struct {
@@ -44,10 +46,13 @@ type RefreshToken struct {
 type User struct {
 	ID         primitive.ObjectID    `bson:"_id",omitempty`
 	Name       string                `bson:"name" form:"name" json:"name" binding:"required"`
-	Username   string                `bson:"username" form:"username" json:"username" binding:"required"`
-	Password   string                `bson:"password" form:"password" json:"password" binding:"required"`
-	AvatarFile *multipart.FileHeader `form:"avatar"`
-	Avatar     string                `bson:"avatar" json:"avatar"`
+	Username   string                `bson:"username" form:"username" json:"username"`
+	Password   string                `bson:"password,omitempty" form:"password" json:"-"`
+	Skill      string                `bson:"skill" form:"skill" json:"skill"`
+	Nickname   string                `bson:"nickname" form:"nickname" json:"nickname"`
+	Age        int                   `bson:"age" form:"age" json:"age"`
+	AvatarFile *multipart.FileHeader `form:"avatar,omitempty" json:"-"`
+	Avatar     string                `bson:"avatar,omitempty" json:"avatar"`
 	CreatedAt  time.Time             `bson:"createdAt" json:"createdAt"`
 	UpdatedAt  time.Time             `bson:"updatedAt" json:"updatedAt"`
 }
@@ -84,11 +89,18 @@ func (repo *UserRepository) CheckUserNameExists(username string) (primitive.Obje
 func (repo *UserRepository) Create(user *User) (primitive.ObjectID, error) {
 	timeNow := time.Now()
 
+	if user.Avatar != "" {
+		user.Avatar = "public/" + user.Avatar
+	}
+
 	res, err := repo.DB.InsertOne(context.TODO(), bson.M{
 		"name":      user.Name,
 		"username":  user.Username,
 		"password":  user.Password,
-		"avatar":    "public/" + user.Avatar,
+		"nickname":  user.Nickname,
+		"age":       user.Age,
+		"skill":     user.Skill,
+		"avatar":    user.Avatar,
 		"createdAt": timeNow,
 		"updatedAt": timeNow,
 	})
@@ -111,6 +123,25 @@ func (repo *UserRepository) CreateRefreshToken(token *RefreshToken) error {
 	return nil
 }
 
+func (repo *UserRepository) GetAll() ([]*User, error) {
+	cur, err := repo.DB.Find(context.TODO(), bson.D{})
+	if err != nil {
+		return nil, err
+	}
+	var results []*User
+	for cur.Next(context.TODO()) {
+		var elem *User
+		err := cur.Decode(&elem)
+		if err != nil {
+			return results, err
+		}
+
+		results = append(results, elem)
+
+	}
+	return results, nil
+}
+
 func (repo *UserRepository) GetAccessToken(token string) (AccessToken, error) {
 	var accessToken AccessToken
 	err := repo.DBAccessToken.FindOne(context.TODO(), bson.D{{"accessToken", token}}).Decode(&accessToken)
@@ -131,5 +162,10 @@ func (repo *UserRepository) GetRefreshToken(token string) (RefreshToken, error) 
 
 func (repo *UserRepository) RemoveRefreshToken(id primitive.ObjectID) error {
 	_, err := repo.DBRefreshToken.DeleteOne(context.TODO(), bson.D{{"_id", id}})
+	return err
+}
+
+func (repo *UserRepository) Delete() error {
+	_, err := repo.DB.DeleteMany(context.TODO(), bson.D{{}})
 	return err
 }
