@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type UserReporer interface {
@@ -124,7 +125,9 @@ func (repo *UserRepository) CreateRefreshToken(token *RefreshToken) error {
 }
 
 func (repo *UserRepository) GetAll() ([]*User, error) {
-	cur, err := repo.DB.Find(context.TODO(), bson.D{})
+	findOptions := options.Find()
+	findOptions.SetSort(bson.D{{"createdAt", -1}})
+	cur, err := repo.DB.Find(context.TODO(), bson.D{}, findOptions)
 	if err != nil {
 		return nil, err
 	}
