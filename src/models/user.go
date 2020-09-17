@@ -22,7 +22,7 @@ type UserReporer interface {
 	GetAccessToken(token string) (AccessToken, error)
 	GetRefreshToken(token string) (RefreshToken, error)
 	RemoveRefreshToken(ID primitive.ObjectID) error
-	GetAll() ([]*User, error)
+	GetAll(limit int64) ([]*User, error)
 	Delete() error
 }
 
@@ -124,9 +124,10 @@ func (repo *UserRepository) CreateRefreshToken(token *RefreshToken) error {
 	return nil
 }
 
-func (repo *UserRepository) GetAll() ([]*User, error) {
+func (repo *UserRepository) GetAll(limit int64) ([]*User, error) {
 	findOptions := options.Find()
 	findOptions.SetSort(bson.D{{"createdAt", -1}})
+	findOptions.SetLimit(limit)
 	cur, err := repo.DB.Find(context.TODO(), bson.D{}, findOptions)
 	if err != nil {
 		return nil, err

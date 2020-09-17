@@ -261,7 +261,7 @@ func (handler *UserHandler) PayloadTokenGet(c *gin.Context) {
 }
 
 func (handler *UserHandler) ShowAllUserGet(c *gin.Context) {
-	users, _ := handler.Service.GetAll()
+	users, _ := handler.Service.GetAll(50)
 	c.JSON(http.StatusOK, utils.ResponseObject(gin.H{
 		"message": "User data retrieval successfully",
 		"total":   len(users),
